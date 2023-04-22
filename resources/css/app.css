@@ -80,3 +80,8 @@ header{
     display: flex;
     align-items: center;
 }
+
+img line{
+    stroke-linecap: round;
+    background-color: red;
+}

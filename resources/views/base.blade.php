@@ -7,6 +7,7 @@
     
     {{-- <link rel="stylesheet" href="{{ mix('resources/css/app.css') }}"> --}}
     @vite("resources/css/app.css")
+    @vite("resources/js/app.js")
     @yield('meta')
 </head>
 <body>

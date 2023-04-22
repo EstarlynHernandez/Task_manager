@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\task;
+use App\Models\Task;
 
 class TaskController extends Controller
 {
@@ -16,6 +16,18 @@ class TaskController extends Controller
         return view('tasks/index', [
             'tasks' => $tasks,
         ]);
+    }
+
+    public function check(Request $request){
+        if($request['id']){
+
+            $task = Task::find($request['id']);
+
+            $task->status = !!!($task->status);
+            $task->save();
+
+            return redirect('/');
+        }
     }
 
     /**
@@ -63,6 +75,13 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if($id){
+
+            $task = Task::find($id);
+
+            $task->delete();
+
+            return redirect('/');
+        }
     }
 }

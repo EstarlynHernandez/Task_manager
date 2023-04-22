@@ -11,21 +11,25 @@
 
             @foreach ($tasks as $task)
                 <li class="task @if ($task['status']) task__complete @endif">
-                    <a href="/" class="task__checked">
+                    <div class="task__checked checked">
+                        <form action="{{ route('task.check') }}" method="post">
+                            @csrf
+                            @method('put')
+                            <input type="hidden" name="id" value="{{$task['id']}}">
+                        </form>
                         <svg fill="transparent" width="2rem" height="2rem">
                             <circle cx="50%" cy="50%" r="40%" stroke="black" stroke-width="5"
                                 stroke-dasharray="251 251" />
                             <circle cx="50%" cy="50%" r="40%" stroke="red" stroke-width="5"
                                 stroke-dasharray="100 251" />
                             @if ($task['status'])
-                                task__complete
                                 <line x1="28%" x2="45%" y1="40%" y2="70%" stroke="black"
                                     stroke-width="5" stroke-linecap="round" />
                                 <line x1="45%" x2="90%" y1="70%" y2="10%" stroke="black"
                                     stroke-width="5" stroke-linecap="round" />
                             @endif
                         </svg>
-                    </a>
+                    </div>
                     <div class="task__info">
                         <h3 class="task__title">{{ $task['name'] }}</h3>
                         <p class="task__text">{{ Str::limit($task['details'], 10) }}</p>
@@ -36,14 +40,18 @@
                             <p>0-10</p>
                         </div>
                     @endif
-                    <a href="#" class="task__delete task__checked">
+                    <div class="task__delete task__checked">
+                        <form action="{{ route('task.delete', [ 'id' => $task['id']]) }}" method="post">
+                            @csrf
+                            @method('delete')
+                        </form>
                         <svg fill="transparent" width="2rem" height="2rem">
                             <line x1="90%" x2="10%" y1="10%" y2="90%" stroke="red"
                                 stroke-width="5" stroke-linecap="round" />
                             <line x1="90%" x2="10%" y1="90%" y2="10%" stroke="red"
                                 stroke-width="5" stroke-linecap="round" />
                         </svg>
-                    </a>
+                    </div>
                 </li>
             @endforeach
 

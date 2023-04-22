@@ -15,3 +15,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [TaskController::class, 'index'] );
+Route::put('/task/check', [TaskController::class, 'check'] )->name('task.check');
+Route::delete('/task/delete/{id}', [TaskController::class, 'destroy'] )->name('task.delete');
