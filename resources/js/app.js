@@ -1,18 +1,40 @@
 document.onload = main();
 
-function main(){
-    let checked = document.querySelectorAll('.checked');
+function main() {
+    task();
+
+    shadowMenu();
+}
+
+function task() {
+    let checked = document.querySelectorAll(".checked");
+    let deleteTask = document.querySelectorAll(".delete");
+
     checked.forEach((check) => {
         check.onclick = (e) => {
             check.children[0].submit();
         };
-    }) 
+    });
 
-    let deleteTask = document.querySelectorAll('.task__delete');
     deleteTask.forEach((del) => {
         del.onclick = (e) => {
-            console.log('a')
             del.children[0].submit();
         };
-    }) 
+    });
+}
+
+function shadowMenu() {
+    let create = document.querySelector(".create");
+    let closeTabs = document.querySelectorAll(".closeTab");
+    let createTab = document.querySelector(".createTab");
+
+    closeTabs.forEach((closeTab) => {
+        closeTab.onclick = () => {
+            create.classList.add("dnone");
+        };
+    });
+
+    createTab.onclick = () => {
+        create.classList.remove("dnone");
+    };
 }

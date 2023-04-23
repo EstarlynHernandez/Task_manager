@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -14,6 +15,29 @@ class UserController extends Controller
         //
     }
 
+    public function login()
+    {
+        return view('user/login');
+    }
+
+    public function auth(Request $request)
+    {
+        if (isset($request['email']) && strlen($request['email']) > 3) {
+
+            $credentials = $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required'],
+            ]);
+
+            if (Auth::attempt($credentials)) {
+                $request->session()->regenerate();
+                return redirect('/');
+            };
+        }
+
+        return redirect('/login');
+
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -60,5 +84,16 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }

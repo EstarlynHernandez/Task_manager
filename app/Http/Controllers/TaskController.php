@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskRequest;
 use Illuminate\Http\Request;
 use App\Models\Task;
+use PhpParser\Node\Stmt\TryCatch;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -12,14 +15,21 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all();
-        return view('tasks/index', [
-            'tasks' => $tasks,
-        ]);
+        if(Auth::user()){
+            $tasks = Task::Where('user_id', Auth::user()->id)->get();
+            
+            return view('tasks/index', [
+                'tasks' => $tasks,
+            ]);
+        }
+
+        return view('tasks/index');
+
     }
 
-    public function check(Request $request){
-        if($request['id']){
+    public function check(Request $request)
+    {
+        if ($request['id']) {
 
             $task = Task::find($request['id']);
 
@@ -41,9 +51,19 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
-        //
+        $task = new Task;
+
+        $task->user_id = Auth::user()->id;
+        $task->name = $request['name'];
+        $task->details = ' ';
+        $task->status = false;
+        $task->type = 'normal';
+
+        $task->save();
+
+        return redirect('/');
     }
 
     /**
@@ -75,12 +95,12 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        if($id){
+        if ($id) {
 
             $task = Task::find($id);
-
-            $task->delete();
-
+            if($task->user_id == Auth::user()->id){
+                $task->delete();   
+            }
             return redirect('/');
         }
     }
