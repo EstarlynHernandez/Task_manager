@@ -35,9 +35,8 @@ class TaskController extends Controller
 
             $task->status = !!!($task->status);
             $task->save();
-
-            return redirect('/');
         }
+        return redirect('/');
     }
 
     /**
@@ -53,15 +52,32 @@ class TaskController extends Controller
      */
     public function store(TaskRequest $request)
     {
-        $task = new Task;
+        if(Auth::user()){
 
-        $task->user_id = Auth::user()->id;
-        $task->name = $request['name'];
-        $task->details = ' ';
-        $task->status = false;
-        $task->type = 'normal';
+            $task = new Task;
+            
+            $task->user_id = Auth::user()->id;
+            $task->name = $request['name'];
+            $task->details = ' ';
+            $task->status = false;
 
-        $task->save();
+            switch ($request['type']) {
+                case 'count':
+                    $task->type = 'count';
+                    $task->count = 1;
+                    if(is_numeric($request->count)){
+                        $task->count = $request->count;
+                    }
+                    break;
+                
+                default:
+                    $task->type = 'normal';
+                    break;
+            }
+
+            
+            $task->save();
+        }
 
         return redirect('/');
     }

@@ -23,7 +23,9 @@ class TaskRequest extends FormRequest
     {
         return [
             'name' => 'required|max:20',
-            'details' => 'nullable|max:512'
+            'details' => 'nullable|max:512',
+            'type' => 'required',
+            'count' => 'nullable',
         ];
     }
 }

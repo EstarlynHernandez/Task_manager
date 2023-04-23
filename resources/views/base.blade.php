@@ -14,7 +14,7 @@
 <body>
     <header>
         <div class="header">
-            <a href="/">Estyos Tasks</a>
+            <a href="/"><img src="{{ asset('icons/logo.svg') }}" alt=""></a>
             <div>
                 @if (Auth::user())
                 <form action="{{ route('logout') }}" method="post">

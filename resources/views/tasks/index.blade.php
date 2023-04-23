@@ -13,8 +13,12 @@
 @endsection
 
 @section('content')
-    <main>
-        <h1 class="tasks__title">Your Tasks</h1>
+    <main class="content" id="content">
+        @if (Auth::user())
+            <h1 class="tasks__title">Your Tasks</h1>
+        @else
+            <h1 class="tasks__title">Local Tasks</h1>
+        @endif
         <ul class="tasks container">
             @isset($tasks)
                 @if ($tasks->count() < 1)
@@ -30,11 +34,11 @@
                                 @method('put')
                                 <input type="hidden" name="id" value="{{ $task['id'] }}">
                             </form>
-                            <svg fill="transparent" width="2rem" height="2rem">
-                                <circle cx="50%" cy="50%" r="40%" stroke="black" stroke-width="5"
-                                    stroke-dasharray="251 251" />
-                                <circle cx="50%" cy="50%" r="40%" stroke="red" stroke-width="5"
-                                    stroke-dasharray="100 251" />
+                            <svg fill="transparent" width="3rem" height="3rem">
+                                <circle cx="50%" cy="50%" r="40%" stroke="black" stroke-width="8"
+                                    stroke-dasharray="251% 251%" />
+                                <circle class="circle" cx="50%" cy="50%" r="40%" stroke="red" stroke-width="2"
+                                    stroke-dasharray="251% 251%" />
                                 @if ($task['status'])
                                     <line x1="28%" x2="45%" y1="40%" y2="70%" stroke="black"
                                         stroke-width="5" stroke-linecap="round" />
@@ -49,20 +53,20 @@
                         </div>
                         @if ($task['type'] != 'normal')
                             <div class="task__time">
-                                <h3>Count</h3>
-                                <p>0-10</p>
+                                <h3 class="task__title" style="text-transform: capitalize">{{ $task['type'] }}</h3>
+                                <p class="task__text">0-{{ $task->count }}</p>
                             </div>
                         @endif
                         <div class="task__delete delete">
-                            <form action="{{ route('task.delete', ['id' => $task['id']]) }}" method="post">
+                            <form action="{{ route('task.destroy', ['task' => $task['id']]) }}" method="post">
                                 @csrf
                                 @method('delete')
                             </form>
-                            <svg fill="transparent" width="2rem" height="2rem">
-                                <line x1="80%" x2="20%" y1="20%" y2="80%" stroke="red"
-                                    stroke-width="5" stroke-linecap="round" />
-                                <line x1="80%" x2="20%" y1="80%" y2="20%" stroke="red"
-                                    stroke-width="5" stroke-linecap="round" />
+                            <svg fill="transparent" width="2.5rem" height="2.5rem">
+                                <line x1="80%" x2="20%" y1="20%" y2="80%" stroke="#BA462B"
+                                    stroke-width="10" stroke-linecap="round" />
+                                <line x1="80%" x2="20%" y1="80%" y2="20%" stroke="#BA462B"
+                                    stroke-width="10" stroke-linecap="round" />
                             </svg>
                         </div>
                     </li>
@@ -100,6 +104,19 @@
             <fieldset class="form__set">
                 <label class="form__title" for="details">Details</label>
                 <textarea class="form__textarea" id="details" name="details"></textarea>
+            </fieldset>
+
+            <fieldset class="form__set">
+                <label for="type" class="form__title">Type</label>
+                <select name="type" class="form__input" id="type">
+                    <option selected value="normal">Normal</option>
+                    <option value="count">Count</option>
+                </select>
+            </fieldset>
+
+            <fieldset class="form__set form__secret dnone" id="count" >
+                <label class="form__title" for="times">Times</label>
+                <input type="number" name="count" id="times" class="form__input">
             </fieldset>
 
             <button class="form__button" type="submit">Create</button>
