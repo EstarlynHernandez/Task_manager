@@ -3,20 +3,15 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
-class TaskRequest extends FormRequest
+class UserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        if(Auth::user()){
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -27,10 +22,12 @@ class TaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|max:20',
-            'details' => 'nullable|max:512',
-            'type' => 'required',
-            'count' => 'nullable',
+            'email' => 'required|email|unique:App\Models\User,email',
+            'username' => 'required|min:3|max:16|unique:App\Models\User,username',
+            'name' => 'required|min:3|max:16',
+            'lastname' => 'required|min:3|max:16',
+            'password' => 'required|min:8|max:24',
+            'rePassword' => 'required|same:password',
         ];
     }
 }

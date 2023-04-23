@@ -41,10 +41,15 @@ header {
     margin-bottom: 1rem;
 }
 
-.blur{
-    filter: blur(1rem);
-    transition: filter 5s;
+.content{
+    transition: filter .5s;
 }
+
+.blur{
+    filter: blur(2rem);
+}
+
+
 
 /* header */
 .header {
