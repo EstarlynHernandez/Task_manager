@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Tgroup;
+use Illuminate\Support\Facades\Auth;
 
-class GroupController extends Controller
+class TgroupController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +29,14 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if(isset($request['gname']) && strlen($request['gname']) > 3){
+            $Tgroup = new Tgroup;
+            $Tgroup->name = htmlspecialchars($request['gname']);
+            $Tgroup->user_id = Auth::user()->id;
+
+            $Tgroup->save();
+        }
+        return redirect('/');
     }
 
     /**

@@ -71,6 +71,7 @@ img{
 .close{
     position: absolute;
     right: 0;
+    top: 1rem;
     background-color: red;
     padding: .5rem;
     font-size: 1.5rem;
@@ -112,10 +113,9 @@ img{
 .menuI{
     display: grid;
     place-items: center;
-    padding: .5rem;
     border-radius: .5rem;
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 2.6rem;
+    height: 2.6rem;
 }
 
 .menu{
@@ -139,30 +139,37 @@ img{
     height: 4vh;
     width: 2rem;
     opacity: 0;
+    z-index: -1;
 }
 
 .userM{
     display: flex;
     align-items: center;
-    height: 3rem;
+    min-height: 3rem;
+    max-height: 6rem;
     justify-content: space-between;
 }
 
 .userM__title{
+    display: block;
     font-size: 2rem;
     color: var(--black);
     font-weight: bold;
+    width: 12rem;
 }
 
 .listM__item{
     background-color: var(--task2);
     border-radius: .5rem;
-    margin-left: 1rem;
-    width: 15rem;
+    width: 16rem;
+    overflow: hidden;
 }
 
 .listM{
     margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
 }
 
 .listM__link{
@@ -195,6 +202,12 @@ img{
     padding: .5rem;
     border-radius: 1rem;
 }
+
+.menu__form{
+    width: 16rem;
+    margin-top: 3rem;
+}
+
 /* Tasks */
 .tasks__title {
     font-size: 3rem;
@@ -399,6 +412,11 @@ img{
     font-size: 2rem;
 }
 
+.group__button{
+    margin-top: 1rem;
+    height: 2.5rem;
+    padding: .2rem;
+}
 
 .form__changeLink{
     display: block;
