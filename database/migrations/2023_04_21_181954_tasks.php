@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('details');
             $table->boolean('status');
             $table->string('type');
+            $table->string('group')->nullable();
             $table->time('time')->nullable();
             $table->integer('count')->nullable();
             $table->foreignIdFor(User::class);

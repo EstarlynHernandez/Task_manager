@@ -35,10 +35,10 @@
                                 <input type="hidden" name="id" value="{{ $task['id'] }}">
                             </form>
                             <svg fill="transparent" width="3rem" height="3rem">
-                                <circle cx="50%" cy="50%" r="40%" stroke="black" stroke-width="8"
+                                <circle cx="50%" cy="50%" r="40%" stroke="black" stroke-width="10"
                                     stroke-dasharray="251% 251%" />
-                                <circle class="circle" cx="50%" cy="50%" r="40%" stroke="red" stroke-width="2"
-                                    stroke-dasharray="251% 251%" />
+                                <circle class="circle" cx="50%" cy="50%" r="40%" stroke="red"
+                                    stroke-width="5" stroke-dasharray="251% 251%" />
                                 @if ($task['status'])
                                     <line x1="28%" x2="45%" y1="40%" y2="70%" stroke="black"
                                         stroke-width="5" stroke-linecap="round" />
@@ -51,47 +51,37 @@
                             <h3 class="task__title">{{ $task['name'] }}</h3>
                             <p class="task__text">{{ Str::limit($task['details'], 10) }}</p>
                         </div>
-                        @if ($task['type'] != 'normal')
-                            <div class="task__time">
+                        <div class="task__time">
+                            @if ($task['type'] != 'normal')
                                 <h3 class="task__title" style="text-transform: capitalize">{{ $task['type'] }}</h3>
                                 <p class="task__text">0-{{ $task->count }}</p>
-                            </div>
-                        @endif
-                        <div class="task__delete delete">
+                            @endif
+                        </div>
+                        <div class="delete close">
                             <form action="{{ route('task.destroy', ['task' => $task['id']]) }}" method="post">
                                 @csrf
                                 @method('delete')
                             </form>
-                            <svg fill="transparent" width="2.5rem" height="2.5rem">
-                                <line x1="80%" x2="20%" y1="20%" y2="80%" stroke="#BA462B"
-                                    stroke-width="10" stroke-linecap="round" />
-                                <line x1="80%" x2="20%" y1="80%" y2="20%" stroke="#BA462B"
-                                    stroke-width="10" stroke-linecap="round" />
-                            </svg>
+                            <p>Delete</p>
                         </div>
                     </li>
                 @endforeach
             @endisset
         </ul>
-        <div class="floating__button createTab">
-            <svg fill="transparent" width="3.5rem" height="3.5rem">
-                <line x1="50%" x2="50%" y1="10%" y2="90%" stroke="#0f0" stroke-width="10"
-                    stroke-linecap="round" />
-                <line x1="90%" x2="10%" y1="50%" y2="50%" stroke="#0f0" stroke-width="10"
-                    stroke-linecap="round" />
-            </svg>
-        </div>
     </main>
+    <div class="floating__button createTab">
+        <svg fill="transparent" width="3.5rem" height="3.5rem">
+            <line x1="50%" x2="50%" y1="10%" y2="90%" stroke="#0f0" stroke-width="10"
+                stroke-linecap="round" />
+            <line x1="90%" x2="10%" y1="50%" y2="50%" stroke="#0f0" stroke-width="10"
+                stroke-linecap="round" />
+        </svg>
+    </div>
     <section class="create dnone">
         <div class="create__header">
             <h1 class="create__title">Add Task</h1>
-            <div class="task__delete closeTab">
-                <svg fill="transparent" width="3.8rem" height="3.8rem">
-                    <line x1="80%" x2="20%" y1="20%" y2="80%" stroke="red" stroke-width="10"
-                        stroke-linecap="round" />
-                    <line x1="80%" x2="20%" y1="80%" y2="20%" stroke="red" stroke-width="10"
-                        stroke-linecap="round" />
-                </svg>
+            <div class="close closeTab">
+                <p>Close</p>
             </div>
         </div>
         <form class="form taskCreate" action="{{ route('task.store') }}" method="post">
@@ -114,7 +104,7 @@
                 </select>
             </fieldset>
 
-            <fieldset class="form__set form__secret dnone" id="count" >
+            <fieldset class="form__set form__secret dnone" id="count">
                 <label class="form__title" for="times">Times</label>
                 <input type="number" name="count" id="times" class="form__input">
             </fieldset>

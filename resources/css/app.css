@@ -33,12 +33,19 @@ li {
 body {
     background: linear-gradient(127deg, var(--bg), var(--bg2));
     min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
 }
 
 header {
     display: block;
     height: 4.5rem;
     margin-bottom: 1rem;
+}
+
+img{
+    width: 100%;
 }
 
 .content{
@@ -49,7 +56,29 @@ header {
     filter: blur(2rem);
 }
 
+.shadow{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
 
+.shadow.dnone{
+    display: none;
+}
+
+.close{
+    position: absolute;
+    right: 0;
+    background-color: red;
+    padding: .5rem;
+    font-size: 1.5rem;
+    border-bottom-left-radius: 1.5rem;
+    border-top-left-radius: .5rem;
+    color: white;
+    max-width: 5rem;
+}
 
 /* header */
 .header {
@@ -60,8 +89,7 @@ header {
     position: fixed;
     display: flex;
     padding: 1rem;
-    background-color: #fff;
-    opacity: .5;
+    /* background-color: #fff; */
     border-bottom-left-radius: 0.8rem;
     border-bottom-right-radius: 0.8rem;
     align-items: center;
@@ -80,6 +108,93 @@ header {
     font-size: 1.2rem;
 }
 
+/* menu */
+.menuI{
+    display: grid;
+    place-items: center;
+    padding: .5rem;
+    border-radius: .5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+}
+
+.menu{
+    background-color: #fff5;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-bottom-left-radius: 1rem;
+    border-top-left-radius: 1rem;
+    padding: .8rem .5rem 1rem 1rem;
+    width: 18rem;
+    height: 100vh;
+    z-index: 100;
+    transition: .5s;
+    overflow: hidden;
+    box-shadow: -1rem 0 5rem black;
+    transition: height .5s, width .5s, opacity .5s;
+}
+
+.menu.dnone{
+    height: 4vh;
+    width: 2rem;
+    opacity: 0;
+}
+
+.userM{
+    display: flex;
+    align-items: center;
+    height: 3rem;
+    justify-content: space-between;
+}
+
+.userM__title{
+    font-size: 2rem;
+    color: var(--black);
+    font-weight: bold;
+}
+
+.listM__item{
+    background-color: var(--task2);
+    border-radius: .5rem;
+    margin-left: 1rem;
+    width: 15rem;
+}
+
+.listM{
+    margin-top: 2rem;
+}
+
+.listM__link{
+    display: block;
+    font-size: 1.8rem;
+    color: var(--black);
+    padding: .8rem;
+}
+
+.listM__open{
+    background-color: var(--gray);
+}
+
+.listM__open .listM__link{
+    color: var(--white);
+}
+
+.listM__logout{
+    position: absolute;
+    bottom: 2rem;
+    color: var(--white);
+    text-transform: capitalize;
+    font-size: 1.8rem;
+    width: 8rem;
+    background-color: var(--gray);
+    text-align: center;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    padding: .5rem;
+    border-radius: 1rem;
+}
 /* Tasks */
 .tasks__title {
     font-size: 3rem;
@@ -96,7 +211,7 @@ header {
 .task {
     display: flex;
     justify-content: space-between;
-    padding: .2rem 0.5rem;
+    padding: .2rem 5.5rem .2rem .5rem;
     background: var(--task);
     border-radius: .8rem;
     box-shadow: 2px 2px 1rem var(--task2);
@@ -177,7 +292,7 @@ header {
 /* create box */
 
 .create {
-    position: fixed;
+    position: absolute;
     bottom: 15vh;
     right: 5vw;
     background-color: rgba(255, 255, 255, 0.287);
@@ -188,6 +303,7 @@ header {
     box-shadow: 0 1rem 3rem black;
     overflow: scroll;
     transition: all .5s;
+    z-index: 10;
 }
 
 .create__header {
@@ -207,6 +323,7 @@ header {
     bottom: 2rem;
     right: 2rem;
     opacity: 0;
+    z-index: -1;
 }
 
 .floating__button{

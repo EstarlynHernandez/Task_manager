@@ -42,16 +42,31 @@ function shadowMenu() {
     let closeTabs = document.querySelectorAll(".closeTab");
     let createTab = document.querySelector(".createTab");
     let content = document.querySelector('#content');
+    let openMenu = document.querySelector('#openMenu');
+    let menu = document.querySelector('#menu');
+    let shadow = document.querySelector('.shadow');
 
+    if(openMenu){
+        openMenu.onclick = () => {
+            menu.classList.remove("dnone");
+            content.classList.add('blur');
+            create.classList.add("dnone");
+            shadow.classList.remove('dnone');
+        };
+    }
+        
     closeTabs.forEach((closeTab) => {
         closeTab.onclick = () => {
+            menu.classList.add("dnone");
             create.classList.add("dnone");
+            shadow.classList.add('dnone');
             content.classList.remove('blur');
         };
     });
 
     createTab.onclick = () => {
         create.classList.remove("dnone");
-        content.classList.add('blur');
+            shadow.classList.remove('dnone');
+            content.classList.add('blur');
     };
 }
