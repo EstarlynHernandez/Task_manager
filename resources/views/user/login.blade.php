@@ -16,7 +16,7 @@
             </fieldset>
 
             <button type="submit" class="form__button">Login</button>
-            <a class="form__changeLink" href="">Register</a>
+            <a class="form__changeLink" href="{{ route('user.create') }}">Register</a>
         </form>
     </section>
 @endsection

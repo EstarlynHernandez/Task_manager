@@ -3,10 +3,11 @@
 @section('content')
     <section>
         <h1 class="tasks__title">Register</h1>
-        <form action="" method="post" class="form">
+        <form action="{{ route('user.store') }}" method="post" class="form">
+            @csrf
             <fieldset class="form__set">
                 <label for="email" class="form__title">Email</label>
-                <input type="email" id="email" name="emal" class="form__input">
+                <input type="email" id="email" name="email" class="form__input">
             </fieldset>
             
             <fieldset class="form__set">
@@ -17,6 +18,11 @@
             <fieldset class="form__set">
                 <label for="name" class="form__title">Name</label>
                 <input type="text" id="name" name="name" class="form__input">
+            </fieldset>
+
+            <fieldset class="form__set">
+                <label for="lastname" class="form__title">LastName</label>
+                <input type="text" id="lastname" name="lastname" class="form__input">
             </fieldset>
             
             <fieldset class="form__set">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TaskRequest;
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\Tgroup;
 use PhpParser\Node\Stmt\TryCatch;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,18 +14,21 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(string $group, Request $request)
     {
-        if(Auth::user()){
-            $tasks = Task::Where('user_id', Auth::user()->id)->get();
-            
+        $request->session()->put('group', $group);
+
+        if (Auth::user()) {
+            $tasks = Task::Where('user_id', Auth::user()->id)->where('group', $group)->get();
+            $groups = Tgroup::Where('user_id', Auth::user()->id)->get();
+
             return view('tasks/index', [
                 'tasks' => $tasks,
+                'groups' => $groups,
             ]);
         }
 
         return view('tasks/index');
-
     }
 
     public function check(Request $request)
@@ -35,9 +39,8 @@ class TaskController extends Controller
 
             $task->status = !!!($task->status);
             $task->save();
-
-            return redirect('/');
         }
+        return redirect('/');
     }
 
     /**
@@ -53,17 +56,38 @@ class TaskController extends Controller
      */
     public function store(TaskRequest $request)
     {
-        $task = new Task;
+        if ($request->session()->get('group') == 'daily'  or Tgroup::Where('user_id', Auth::user()->id)->where('name', $request->session()->get('group'))->exists()) {
+       
+            if (Auth::user()) {
 
-        $task->user_id = Auth::user()->id;
-        $task->name = $request['name'];
-        $task->details = ' ';
-        $task->status = false;
-        $task->type = 'normal';
+                $task = new Task;
 
-        $task->save();
+                $task->user_id = Auth::user()->id;
+                $task->name = $request['name'];
+                $task->details = ' ';
+                $task->status = false;
+                $task->group = $request->session()->get('group');
 
-        return redirect('/');
+                switch ($request['type']) {
+                    case 'count':
+                        $task->type = 'count';
+                        $task->count = 1;
+                        if (is_numeric($request->count)) {
+                            $task->count = $request->count;
+                        }
+                        break;
+
+                    default:
+                        $task->type = 'normal';
+                        break;
+                }
+
+
+                $task->save();
+            }
+        }
+
+        return redirect('/'.$request->session()->get('group'));
     }
 
     /**
@@ -98,8 +122,8 @@ class TaskController extends Controller
         if ($id) {
 
             $task = Task::find($id);
-            if($task->user_id == Auth::user()->id){
-                $task->delete();   
+            if ($task->user_id == Auth::user()->id) {
+                $task->delete();
             }
             return redirect('/');
         }
