@@ -1,6 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/vs,composer,laravel,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=vs,composer,laravel,node
-
+.htaccess
 ### Composer ###
 composer.phar
 /vendor/
