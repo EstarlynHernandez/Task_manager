@@ -27,7 +27,7 @@
                     <p class="some__text">The live is only one, enjoy and be happy</p>
                 @endif
                 @foreach ($tasks as $task)
-                    <li class="task @if ($task['status']) task__complete @endif">
+                    <li id="{{ $task->id }}" class="task @if ($task['status']) task__complete @endif">
                         <div class="task__checked checked">
                             <form action="{{ route('task.check') }}" method="post">
                                 @csrf
@@ -51,10 +51,10 @@
                             <h3 class="task__title">{{ $task['name'] }}</h3>
                             <p class="task__text">{{ Str::limit($task['details'], 10) }}</p>
                         </div>
-                        <div class="task__time">
-                            @if ($task['type'] != 'normal')
+                        <div class="task__time taskExtra">
+                            @if ($task['type'] == 'count')
                                 <h3 class="task__title" style="text-transform: capitalize">{{ $task['type'] }}</h3>
-                                <p class="task__text">0-{{ $task->count }}</p>
+                                <p class="task__text">{{ $task->times() }}</p>
                             @endif
                         </div>
                         <div class="delete close">
@@ -71,9 +71,9 @@
     </main>
     <div class="floating__button createTab">
         <svg fill="transparent" width="3.5rem" height="3.5rem">
-            <line x1="50%" x2="50%" y1="10%" y2="90%" stroke="#0f0" stroke-width="10"
+            <line x1="50%" x2="50%" y1="10%" y2="90%" stroke="#00f" stroke-width="10"
                 stroke-linecap="round" />
-            <line x1="90%" x2="10%" y1="50%" y2="50%" stroke="#0f0" stroke-width="10"
+            <line x1="90%" x2="10%" y1="50%" y2="50%" stroke="#00f" stroke-width="10"
                 stroke-linecap="round" />
         </svg>
     </div>

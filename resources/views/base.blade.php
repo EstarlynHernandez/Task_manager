@@ -38,27 +38,29 @@
                     <p>Close</p>
                 </div>
             </div>
-            <ul class="listM">
-                <li class="listM__item listM__open">
-                    <a class="listM__link" href="/">Daily Task</a>
-                </li>
-
-                @foreach ($groups as $group)
+            <div class="userG">
+                <ul class="listM">
                     <li class="listM__item listM__open">
-                        <a class="listM__link" href="{{ route('home', [$group->name]) }}">{{ $group->name }}</a>
+                        <a class="listM__link" href="/">Daily Task</a>
                     </li>
-                @endforeach
-            </ul>
-            <form class="form menu__form" method="post" action="{{ route('tgroup.store') }}">
-                @csrf
-                <h3 class="form__title">Add Group</h3>
 
-                <fieldset class="form__set">
-                    <input placeholder="Name" type="text" id="gName" name="gname" class="form__input">
-                </fieldset>
+                    @foreach ($groups as $group)
+                        <li class="listM__item listM__open">
+                            <a class="listM__link" href="{{ route('home', [$group->id]) }}">{{ $group->name }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+                <form class="form menu__form" method="post" action="{{ route('tgroup.store') }}">
+                    @csrf
+                    <h3 class="form__title">Add</h3>
 
-                <button type="submit" class="form__button group__button">Create</button>
-            </form>
+                    <fieldset class="form__set">
+                        <input placeholder="Name" type="text" id="gName" name="gname" class="form__input">
+                    </fieldset>
+
+                    <button type="submit" class="form__button group__button">Create</button>
+                </form>
+            </div>
             <form action="{{ route('logout') }}" method="post">
                 @csrf
                 @method('delete')

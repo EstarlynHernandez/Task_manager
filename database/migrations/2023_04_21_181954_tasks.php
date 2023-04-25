@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\User;
+use App\Models\Tgroup;
 
 return new class extends Migration
 {
@@ -17,10 +18,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('details');
             $table->boolean('status');
+            $table->datetime('complete_at')->nullable();
             $table->string('type');
-            $table->string('group')->nullable();
+            $table->foreignIdFor(Tgroup::class)->nullable();
             $table->time('time')->nullable();
-            $table->integer('count')->nullable();
+            $table->string('count')->nullable();
+            $table->string('value')->nullable();
             $table->foreignIdFor(User::class);
             $table->timestamps();
         });

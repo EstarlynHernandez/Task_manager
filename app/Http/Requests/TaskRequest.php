@@ -27,10 +27,10 @@ class TaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|max:20',
-            'details' => 'nullable|max:512',
+            'name' => 'required|max:20|regex:/^[\pL\s\0-9]+$/u',
+            'details' => 'nullable|max:512|regex:/^[\pL\s\0-9\.,\-_]+$/u',
             'type' => 'required',
-            'count' => 'nullable',
+            'count' => 'nullable|numeric|max_digits:999',
         ];
     }
 }
