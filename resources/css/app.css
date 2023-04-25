@@ -100,7 +100,6 @@ img{
 .header a {
     display: flex;
     align-items: center;
-    filter: blur(.6px);
 }
 
 .menu__button{
