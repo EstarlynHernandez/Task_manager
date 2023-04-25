@@ -17,10 +17,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-// Tasks
-Route::get('/{group?}', [TaskController::class, 'index'] )->defaults('group', 'daily')->name('home');
-Route::put('/task/check', [TaskController::class, 'check'] )->name('task.check');
-Route::resource('task', TaskController::class);
 
 
 // User
@@ -33,3 +29,8 @@ Route::resource('user', UserController::class);
 
 // task group
 Route::resource('/tgroup', TgroupController::class);
+
+// Tasks
+Route::get('/{group?}', [TaskController::class, 'index'] )->defaults('group', 'daily')->name('home');
+Route::put('/task/check', [TaskController::class, 'check'] )->name('task.check');
+Route::resource('task', TaskController::class);
