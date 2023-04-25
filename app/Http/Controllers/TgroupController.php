@@ -29,14 +29,18 @@ class TgroupController extends Controller
      */
     public function store(Request $request)
     {
-        if(isset($request['gname']) && strlen($request['gname']) > 3){
+        $request->validate([
+            'gname' => ['required', 'regex:/^[\pL\s\0-9]+$/u']
+        ]);
+
+        if (isset($request['gname']) && strlen($request['gname']) >= 3) {
             $Tgroup = new Tgroup;
             $Tgroup->name = htmlspecialchars($request['gname']);
             $Tgroup->user_id = Auth::user()->id;
 
             $Tgroup->save();
         }
-        return redirect('/');
+        return redirect('/'.$Tgroup->id);
     }
 
     /**

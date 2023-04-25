@@ -31,6 +31,7 @@ Route::resource('user', UserController::class);
 Route::resource('/tgroup', TgroupController::class);
 
 // Tasks
-Route::get('/{group?}', [TaskController::class, 'index'] )->defaults('group', 'daily')->name('home');
+Route::put('/task/up', [TaskController::class, 'up']);
+Route::get('/{group?}', [TaskController::class, 'index'] )->defaults('group', 0)->name('home');
 Route::put('/task/check', [TaskController::class, 'check'] )->name('task.check');
 Route::resource('task', TaskController::class);

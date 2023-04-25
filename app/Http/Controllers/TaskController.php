@@ -6,6 +6,7 @@ use App\Http\Requests\TaskRequest;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\Tgroup;
+use Illuminate\Database\Eloquent\Casts\Json;
 use PhpParser\Node\Stmt\TryCatch;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,8 +20,13 @@ class TaskController extends Controller
         $request->session()->put('group', $group);
 
         if (Auth::user()) {
-            $tasks = Task::Where('user_id', Auth::user()->id)->where('group', $group)->get();
             $groups = Tgroup::Where('user_id', Auth::user()->id)->get();
+            if ($group == 0 or !Tgroup::where('id', $group)->exists()) {
+                $request->session()->put('group', 0);
+                $tasks = Task::Where('user_id', Auth::user()->id)->where('tgroup_id', 0)->get();
+            } else {
+                $tasks = Task::Where('user_id', Auth::user()->id)->where('tgroup_id', $group)->get();
+            }
 
             return view('tasks/index', [
                 'tasks' => $tasks,
@@ -40,7 +46,7 @@ class TaskController extends Controller
             $task->status = !!!($task->status);
             $task->save();
         }
-        return redirect('/');
+        return redirect('/' . $request->session()->get('group'));
     }
 
     /**
@@ -56,8 +62,7 @@ class TaskController extends Controller
      */
     public function store(TaskRequest $request)
     {
-        if ($request->session()->get('group') == 'daily'  or Tgroup::Where('user_id', Auth::user()->id)->where('name', $request->session()->get('group'))->exists()) {
-       
+        if ($request->session()->get('group') == 0  or Tgroup::where('id', $request->session()->get('group'))->where('user_id', Auth::user()->id)->exists()) {
             if (Auth::user()) {
 
                 $task = new Task;
@@ -66,14 +71,14 @@ class TaskController extends Controller
                 $task->name = $request['name'];
                 $task->details = ' ';
                 $task->status = false;
-                $task->group = $request->session()->get('group');
+                $task->tgroup_id = $request->session()->get('group');
 
                 switch ($request['type']) {
                     case 'count':
                         $task->type = 'count';
-                        $task->count = 1;
+                        $task->count = '0-1';
                         if (is_numeric($request->count)) {
-                            $task->count = $request->count;
+                            $task->count = "0-$request->count";
                         }
                         break;
 
@@ -82,12 +87,11 @@ class TaskController extends Controller
                         break;
                 }
 
-
                 $task->save();
             }
         }
 
-        return redirect('/'.$request->session()->get('group'));
+        return redirect('/' . $request->session()->get('group'));
     }
 
     /**
@@ -117,7 +121,7 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, Request $request)
     {
         if ($id) {
 
@@ -125,7 +129,15 @@ class TaskController extends Controller
             if ($task->user_id == Auth::user()->id) {
                 $task->delete();
             }
-            return redirect('/');
         }
+        return redirect('/' . $request->session()->get('group'));
+    }
+
+    public function up(Request $request)
+    {
+        $task = Task::where('id', 11)->first();
+
+        $task->status = !!!($task->status);
+        $task->save();
     }
 }
