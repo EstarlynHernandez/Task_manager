@@ -126,7 +126,7 @@ class TaskController extends Controller
         if ($id) {
 
             $task = Task::find($id);
-            if ($task->user_id == Auth::user()->id) {
+            if (Task::where('id', $id)->exists() && $task->user_id == Auth::user()->id) {
                 $task->delete();
             }
         }

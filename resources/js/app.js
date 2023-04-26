@@ -3,6 +3,8 @@ document.onload = main();
 function main() {
     task();
     shadowMenu();
+    moveTask('.task');
+    moveTask('.groupItem');
 }
 
 function task() {
@@ -14,7 +16,7 @@ function task() {
 
     checked.forEach((check) => {
         check.onclick = (e) => {
-            check.parentElement.classList.toggle("task__complete");
+            check.parentElement.parentElement.classList.toggle("task__complete");
             check.children[0].submit();
         };
     });
@@ -32,7 +34,6 @@ function task() {
         }
         if (taskType.value != "normal") {
             hiddenType = document.querySelector("#" + taskType.value);
-            console.log("#" + taskType.value);
             hiddenType.classList.remove("dnone");
         }
     };
@@ -40,12 +41,42 @@ function task() {
     tastExtra.forEach((extra) => {
         if (
             extra.childElementCount > 0 &&
-            !extra.parentElement.classList.contains("task__complete")
+            !extra.parentElement.parentElement.classList.contains("task__complete")
         ) {
             extra.onclick = () => {
                 sendUpdate(extra);
             };
         }
+    });
+}
+
+function moveTask(items) {
+    let tasks = document.querySelectorAll(items);
+    let mouseX;
+    let down;
+    let newMouseX;
+
+    tasks.forEach((task) => {
+        task.addEventListener("touchstart", (e) => {
+            down = true;
+            mouseX = e.touches[0].screenX;
+        });
+        task.addEventListener("touchmove", (e) => {
+            if (down) {
+                newMouseX = e.touches[0].screenX - mouseX;
+                if (newMouseX > -120 && newMouseX < 5) {
+                    task.style = "left:" + newMouseX + "px";
+                }
+            }
+        });
+        task.addEventListener("touchend", () => {
+            down = false;
+            if (newMouseX < -30) {
+                task.style = "left: -80px";
+            }else{
+                task.style = "left: 0px";
+            }
+        });
     });
 }
 
@@ -84,17 +115,14 @@ function shadowMenu() {
 }
 
 function sendUpdate(item) {
-    let data = item.parentElement.id;
-    let url = "http://tasks_manager.test/task/up";
     let values = item.querySelector("p").innerText.split("-");
     let result = parseInt(values[0]) + 1;
 
     item.querySelector("p").innerText = result + "-" + values[1];
 
     if (result == values[1]) {
-        console.log(item.parentElement.querySelector("form"));
         let check = item.parentElement.querySelector(".checked form");
-        item.parentElement.classList.toggle("task__complete");
+        item.parentElement.parentElement.classList.toggle("task__complete");
 
         check.submit();
     }
