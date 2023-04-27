@@ -260,7 +260,7 @@ img{
     position: relative;
     display: flex;
     justify-content: space-between;
-    padding: .2rem 5.5rem .2rem .5rem;
+    padding: .2rem 1rem .2rem .5rem;
     background: var(--task);
     border-radius: .5rem;
     box-shadow: 2px 2px 1rem var(--task2);

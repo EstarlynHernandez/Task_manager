@@ -28,9 +28,10 @@ class TaskRequest extends FormRequest
     {
         return [
             'name' => 'required|max:20|regex:/^[\pL\s\0-9]+$/u',
-            'details' => 'nullable|max:512|regex:/^[\pL\s\0-9\.,\-_]+$/u',
+            'details' => 'nullable|max:512|regex:/^[\pL\s\0-9\.,\:;\-_]+$/u',
             'type' => 'required',
-            'count' => 'nullable|numeric|max_digits:999',
+            'count' => 'nullable|numeric|max:999',
+            'time' => 'nullable|numeric|max:1440',
         ];
     }
 }

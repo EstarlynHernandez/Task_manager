@@ -16,14 +16,14 @@ return new class extends Migration
         Schema::create('tasks', function(Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('details');
+            $table->longText('details')->nullable();
             $table->boolean('status');
             $table->datetime('complete_at')->nullable();
             $table->string('type');
             $table->foreignIdFor(Tgroup::class)->nullable();
-            $table->time('time')->nullable();
-            $table->string('count')->nullable();
-            $table->string('value')->nullable();
+            $table->date('date')->nullable();
+            $table->integer('count')->nullable();
+            $table->integer('value')->nullable();
             $table->foreignIdFor(User::class);
             $table->timestamps();
         });

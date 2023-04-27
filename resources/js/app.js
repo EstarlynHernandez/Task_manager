@@ -3,8 +3,8 @@ document.onload = main();
 function main() {
     task();
     shadowMenu();
-    moveTask('.task');
-    moveTask('.groupItem');
+    moveTask(".task");
+    moveTask(".groupItem");
 }
 
 function task() {
@@ -16,7 +16,9 @@ function task() {
 
     checked.forEach((check) => {
         check.onclick = (e) => {
-            check.parentElement.parentElement.classList.toggle("task__complete");
+            check.parentElement.parentElement.classList.toggle(
+                "task__complete"
+            );
             check.children[0].submit();
         };
     });
@@ -41,7 +43,9 @@ function task() {
     tastExtra.forEach((extra) => {
         if (
             extra.childElementCount > 0 &&
-            !extra.parentElement.parentElement.classList.contains("task__complete")
+            !extra.parentElement.parentElement.classList.contains(
+                "task__complete"
+            )
         ) {
             extra.onclick = () => {
                 sendUpdate(extra);
@@ -73,7 +77,7 @@ function moveTask(items) {
             down = false;
             if (newMouseX < -30) {
                 task.style = "left: -80px";
-            }else{
+            } else {
                 task.style = "left: 0px";
             }
         });
@@ -115,15 +119,63 @@ function shadowMenu() {
 }
 
 function sendUpdate(item) {
-    let values = item.querySelector("p").innerText.split("-");
-    let result = parseInt(values[0]) + 1;
+    let element = item.querySelector(".value");
+    let end = item.querySelector(".value-2");
 
-    item.querySelector("p").innerText = result + "-" + values[1];
-
-    if (result == values[1]) {
-        let check = item.parentElement.querySelector(".checked form");
-        item.parentElement.parentElement.classList.toggle("task__complete");
-
-        check.submit();
+    if (item.classList.contains("count")) {
+        if (
+            addValue(
+                parseInt(element.innerText),
+                parseInt(end.innerText),
+                element
+            )
+        ) {
+            let check = item.parentElement.querySelector(".checked form");
+            check.submit();
+        }
+    } else if (item.classList.contains("time")) {
+        if (countValue(element, end)) {
+            let check = item.parentElement.querySelector(".checked form");
+            // check.submit();
+        }
     }
+}
+
+function addValue(value, end, item) {
+    if (value < end) {
+        item.innerText = value + 1;
+        if (value + 1 < end) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function countValue(minutes, seconds) {
+    if (!minutes.classList.contains("isOn")) {
+        minutes.classList.add("isOn");
+        if (minutes.innerText > 0 || seconds.innerText > 0) {
+            let time = setInterval(() => {
+                if (!minutes.classList.contains("isOn")) {
+                    clearInterval(time);
+                }
+                if (seconds.innerText > 0) {
+                    seconds.innerText -= 1;
+                } else if (minutes.innerText > 0) {
+                    minutes.innerText -= 1;
+                    seconds.innerText = 59;
+                } else {
+                    let check =
+                        minutes.parentElement.parentElement.parentElement.querySelector(
+                            ".checked form"
+                        );
+                    check.submit();
+                    clearInterval(time);
+                }
+            }, 1000);
+        }
+    } else {
+        minutes.classList.remove("isOn");
+    }
+    return false;
 }
