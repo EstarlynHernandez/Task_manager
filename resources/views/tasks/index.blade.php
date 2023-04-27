@@ -23,9 +23,7 @@
             @isset($tasks)
                 @if ($tasks->count() < 1)
                     <li>
-                        <p class="some__text">The day is so long, find something to do</p>
-                        <p class="some__text">I you are working all day, i am sorry</p>
-                        <p class="some__text">The live is only one, enjoy and be happy</p>
+                        <p class="some__text">This place is empty</p>
                     <li>
                 @endif
                 @foreach ($tasks as $task)
