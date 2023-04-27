@@ -6,8 +6,7 @@ use App\Http\Requests\TaskRequest;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\Tgroup;
-use Illuminate\Database\Eloquent\Casts\Json;
-use PhpParser\Node\Stmt\TryCatch;
+use DateTime;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -44,6 +43,7 @@ class TaskController extends Controller
             $task = Task::find($request['id']);
 
             $task->status = !!!($task->status);
+            $task->complete_at = new DateTime();
             $task->save();
         }
         return redirect('/' . $request->session()->get('group'));
@@ -69,16 +69,28 @@ class TaskController extends Controller
 
                 $task->user_id = Auth::user()->id;
                 $task->name = $request['name'];
-                $task->details = ' ';
+                $task->details = $request['details'];
                 $task->status = false;
+                $task->date = new DateTime();
                 $task->tgroup_id = $request->session()->get('group');
 
                 switch ($request['type']) {
                     case 'count':
                         $task->type = 'count';
                         $task->count = '0-1';
+                        $task->value = 0;
                         if (is_numeric($request->count)) {
-                            $task->count = "0-$request->count";
+                            $task->count = $request->count;
+                        }
+                        break;
+
+                    case 'time':
+                        $task->type = 'time';
+                        $task->count = 60;
+                        $task->value = 60;
+                        if (is_numeric($request->time)) {
+                            $task->count = $request->time * 60;
+                            $task->value = $request->time * 60;
                         }
                         break;
 
@@ -126,7 +138,7 @@ class TaskController extends Controller
         if ($id) {
 
             $task = Task::find($id);
-            if ($task->user_id == Auth::user()->id) {
+            if (Task::where('id', $id)->exists() && $task->user_id == Auth::user()->id) {
                 $task->delete();
             }
         }

@@ -4,7 +4,8 @@ function main() {
     localTask();
     task();
 
-    shadowMenu();
+    shadowMenu();    
+
 }
 
 function task() {
@@ -83,11 +84,13 @@ function localTask() {
             createTask(task, tasks);
         });
     }
+    moveTask('.task');
 }
 
 function createTask(task, tasks) {
     let container = document.querySelector(".tasks");
     let li = document.createElement("li");
+    let item = document.createElement("div");
     let taskStatus = document.createElement("img");
     let taskDelete = document.createElement("div");
     let del = document.createElement('p');
@@ -113,23 +116,25 @@ function createTask(task, tasks) {
     };
 
     del.innerText ='Delete';
-    taskDelete.classList.add("close", "delete");
+    taskDelete.classList.add("task__delete", "delete");
     taskDelete.appendChild(del);
 
     taskDelete.onclick = () => {
         removeTask(task, tasks);
     };
 
-    li.classList.add("task");
+    item.classList.add('task');
+    li.classList.add("tasks__list");
 
     if (task.complete) {
         li.classList.add("task__complete");
         taskStatus.setAttribute("src", "icons/complete.svg");
     }
 
-    li.appendChild(taskStatus);
-    li.appendChild(info);
-    li.appendChild(div);
+    item.appendChild(taskStatus);
+    item.appendChild(info);
+    item.appendChild(div);
+    li.appendChild(item);
     li.appendChild(taskDelete);
 
     container.appendChild(li);
@@ -186,4 +191,34 @@ function removeTask(task, tasks) {
     localStorage.setItem("task", JSON.stringify(items));
 
     localTask();
+}
+
+function moveTask(items) {
+    let tasks = document.querySelectorAll(items);
+    let mouseX;
+    let down;
+    let newMouseX;
+
+    tasks.forEach((task) => {
+        task.addEventListener("touchstart", (e) => {
+            down = true;
+            mouseX = e.touches[0].screenX;
+        });
+        task.addEventListener("touchmove", (e) => {
+            if (down) {
+                newMouseX = e.touches[0].screenX - mouseX;
+                if (newMouseX > -120 && newMouseX < 5) {
+                    task.style = "left:" + newMouseX + "px";
+                }
+            }
+        });
+        task.addEventListener("touchend", () => {
+            down = false;
+            if (newMouseX < -30) {
+                task.style = "left: -80px";
+            }else{
+                task.style = "left: 0px";
+            }
+        });
+    });
 }

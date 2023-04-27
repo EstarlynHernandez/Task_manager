@@ -45,8 +45,17 @@
                     </li>
 
                     @foreach ($groups as $group)
-                        <li class="listM__item listM__open">
-                            <a class="listM__link" href="{{ route('home', [$group->id]) }}">{{ $group->name }}</a>
+                        <li class="listM__item--container">
+                            <div class="listM__item groupItem">
+                                <a class="listM__link" href="{{ route('home', [$group->id]) }}">{{ $group->name }}</a>
+                            </div>
+                            <div class="task__delete delete">
+                                <form action="{{ route('tgroup.destroy', ['tgroup' => $group['id']]) }}" method="post">
+                                    @csrf
+                                    @method('delete')
+                                </form>
+                                <p>Remove</p>
+                            </div>
                         </li>
                     @endforeach
                 </ul>

@@ -72,6 +72,12 @@ class TgroupController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        
+        $tgroup = Tgroup::find($id);
+        if(Tgroup::where('id', $id)->exists() && $tgroup->user_id == Auth::user()->id){
+            $tgroup->delete();
+        }
+        
+        return redirect('/');
     }
 }
