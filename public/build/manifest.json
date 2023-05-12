@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-e9d06b2a.css",
+    "file": "assets/app-6e33b717.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
@@ -13,5 +13,10 @@
     "file": "assets/local-ce11b312.js",
     "isEntry": true,
     "src": "resources/js/local.js"
+  },
+  "resources/react/react_app.jsx": {
+    "file": "assets/react_app-c3b1f229.js",
+    "isEntry": true,
+    "src": "resources/react/react_app.jsx"
   }
 }

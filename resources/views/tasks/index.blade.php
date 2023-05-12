@@ -4,6 +4,7 @@
     Tasks
 @endsection
 
+@vite('resources/react/react_app.jsx')
 @section('meta')
     @if (Auth::user())
         @vite('resources/js/app.js')
@@ -13,9 +14,8 @@
 @endsection
 
 @section('content')
-    <main class="content" id="content">
+<main class="content" id="content">
         <div>
-
             <div class="task__header">
                 @if (Auth::user())
                     <h1 class="tasks__title">Your Tasks</h1>
