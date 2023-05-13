@@ -34,5 +34,6 @@ Route::post('group/store', [ApiTgroupController::class, 'store'])->middleware('a
 Route::put('group/check', [ApiTgroupController::class, 'check'])->middleware('auth:sanctum');
 Route::delete('group/delete', [ApiTgroupController::class, 'destroy'])->middleware('auth:sanctum');
 
-// login
+// user
 Route::post('login', [ApiController::class, 'login']);
+Route::post('user/store', [ApiController::class, 'store']);

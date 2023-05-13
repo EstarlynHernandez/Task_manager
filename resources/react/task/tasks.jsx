@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { Task } from "./task";
 import { useTasks, useGroup } from "../hooks/useTasks";
 import { Create } from "./create";
-import { Group } from "./group";
+import { Groups } from "./groups";
 
 export function Tasks() {
   const [tasks, updateTask] = useTasks([]);
   const [isOpen, setIsOpen] = useState(false);
   const [groups, updateGroup] = useGroup([]);
 
+  
   return (
     <main className="content">
       {isOpen && (
@@ -55,6 +56,7 @@ export function Tasks() {
         <ul className="tasks continer">
           {tasks.length > 0 &&
             tasks.map((task) => (
+              task &&
               <Task
                 key={task.id}
                 task={task}
@@ -63,7 +65,7 @@ export function Tasks() {
             ))}
         </ul>
       </div>
-      <Group groups={groups} updateGroup={updateGroup} updateTask={updateTask}/>
+      <Groups groups={groups} updateGroup={updateGroup} updateTask={updateTask}/>
     </main>
   );
 }

@@ -1,13 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 
 export function Task({ task, updateTask }) {
+  const [mouseX, setMouseX] = useState(0);
+  const [newMouseX, setNewMouseX] = useState(0);
+  const [left, setLeft] = useState(0);
+
+  function touch(e) {
+    setMouseX(e.touches[0].screenX);
+  }
+  function touchMove(e) {
+    if (left > 1) {
+      setNewMouseX(0);
+    } else {
+      setNewMouseX(e.touches[0].screenX - mouseX);
+      setLeft(newMouseX);
+    }
+  }
+  function endTouch(e) {
+    if (newMouseX < -30) {
+      setLeft(-80);
+    } else {
+      setLeft(0);
+    }
+  }
+
   return (
     <li
       id="id"
       className={!task.status ? "tasks__list" : "tasks__list task__complete"}
       key={task.id}
     >
-      <div className="task">
+      <div
+        className="task"
+        onTouchStart={touch}
+        onTouchEnd={endTouch}
+        onTouchMove={touchMove}
+        style={{ left: left + "px" }}
+      >
         <div
           className="task__checked checked"
           onClick={() => {
@@ -96,7 +125,7 @@ export function Task({ task, updateTask }) {
                 Remains
               </h3>
               <p className="task__text">
-                <span className="task__minutes value">{parseInt(task.value / 60) }</span>m <span className="task__seconds value-2">{task.value % 60 }</span>s
+                <span className="task__minutes value">{parseInt(task.value / 60)}</span>m <span className="task__seconds value-2">{task.value % 60}</span>s
               </p>
             </>
           )}

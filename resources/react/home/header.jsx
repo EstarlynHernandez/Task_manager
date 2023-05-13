@@ -2,11 +2,20 @@ import React, { useContext } from "react";
 import { Auth } from "../IndexContex";
 
 export function Header() {
-  const { isAuth } = useContext(Auth);
+  const { isAuth, setIsMenuOpen, setIsAuth, setPage } = useContext(Auth);
+
+  function logout() {
+    localStorage.removeItem("token");
+    setIsAuth(false);
+  }
   return (
     <header>
       <div className="header">
-        <picture>
+        <picture
+          onClick={() => {
+            setPage("home");
+          }}
+        >
           <img
             src="icons/logo.svg"
             alt="Estyos Task"
@@ -21,12 +30,27 @@ export function Header() {
               <img
                 src="icons/menu.svg"
                 alt="Menu"
+                onClick={() => {
+                  setIsMenuOpen(true);
+                }}
               />
             </div>
-            <p className="menu_button only__desktop">Logout</p>
+            <p
+              className="menu__button only__desktop"
+              onClick={logout}
+            >
+              Logout
+            </p>
           </>
         ) : (
-          <p className="menu_button">Login</p>
+          <p
+            className="menu__button"
+            onClick={() => {
+              setPage("login");
+            }}
+          >
+            Login
+          </p>
         )}
       </div>
     </header>

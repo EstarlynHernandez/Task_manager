@@ -97,6 +97,9 @@ class ApiTaskController extends Controller
             }
             $task->status = false;
             $task->user_id = Auth::user()->id;
+            if(is_numeric(Auth::user()->task_group)){
+                $task->tgroup_id = Auth::user()->task_group;
+            }
 
             $task->save();
 

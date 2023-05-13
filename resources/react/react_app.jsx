@@ -7,8 +7,10 @@ import { User } from "./IndexContex";
 const root = createRoot(document.querySelector("#root"));
 
 root.render(
-  <User>
-    <Header />
-    <Index />
-  </User>
+  <React.StrictMode>
+    <User>
+      <Header />
+      <Index />
+    </User>
+  </React.StrictMode>
 );

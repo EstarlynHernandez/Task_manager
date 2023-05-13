@@ -1,12 +1,10 @@
-import React from "react";
-import { useState } from "react";
+import React, { useContext } from "react";
 import { Tasks } from "../task/tasks";
-import { Create } from "../task/create";
+import { Login } from "../user/login";
+import { Auth } from "../IndexContex";
+import { Register } from "../user/register";
 
 export function Index() {
-    return (
-        <>
-            <Tasks />
-        </>
-    );
+  const { page } = useContext(Auth);
+  return <>{page == "login" ? <Login /> : page == "register" ? <Register /> : <Tasks />}</>;
 }

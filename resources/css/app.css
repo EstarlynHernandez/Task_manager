@@ -36,11 +36,12 @@ li {
 }
 
 body {
+  overflow-x: hidden;
   background: linear-gradient(127deg, var(--bg), var(--bg2));
 }
 
 .body {
-  min-height: 100vh;
+  height: calc(100vh - 4.5rem);
   width: 100%;
   position: relative;
   max-width: 720px;
@@ -62,9 +63,16 @@ img {
   box-shadow: var(--danger) 0 0 1rem;
 }
 
+/* content */
+
 .content {
   transition: filter 0.5s;
-  margin-bottom: 6rem;
+  overflow: hidden;
+  height: 100%;
+}
+
+.content > div {
+  height: calc(100% - 1rem);
 }
 
 .blur {
@@ -113,6 +121,9 @@ img {
     width: 8rem;
     max-width: 8rem;
     font-size: 2rem;
+  }
+  .content > div {
+    height: calc(100% - 6rem);
   }
 
   .delete-desktop {
@@ -303,6 +314,7 @@ img {
 
 @media screen and (min-width: 800px) {
   .menu__button {
+    cursor: pointer;
     font-size: 2rem;
   }
 
@@ -330,6 +342,7 @@ img {
     right: 0;
     top: 5vh;
     border-radius: 2rem;
+    box-shadow: 1rem 1rem 2rem black;
   }
 
   .menu .close {
@@ -395,6 +408,9 @@ img {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  height: calc(100% - 2rem);
+  overflow: scroll;
+  padding: 1rem 1rem 8rem;
 }
 
 .tasks__list {
