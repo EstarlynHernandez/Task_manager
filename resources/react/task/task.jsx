@@ -17,8 +17,8 @@ export function Task({ task, updateTask }) {
     }
   }
   function endTouch(e) {
-    if (newMouseX < -30) {
-      setLeft(-80);
+    if (newMouseX < -40) {
+      setLeft(-100);
     } else {
       setLeft(0);
     }

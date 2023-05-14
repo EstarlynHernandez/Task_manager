@@ -307,9 +307,38 @@ img {
   max-height: 10%;
 }
 
+form .listM__create{
+  border: none;
+  height: 3rem;
+  margin-bottom: 1rem;
+}
+
+form .listM__create:focus-within{
+  transform: scale(1.5);
+}
+
+
+.menu__form .listM__button{
+  margin: .5rem auto;
+  height: 3rem;
+  width: 10rem;
+  padding: 0;
+}
+
+.listM__input{
+  background-color: #fff7;
+  width: 100%;
+  height: 100%;
+  padding: .5rem;
+  outline: none;
+  border: none;
+  font-size: 1rem;
+  text-align: center;
+}
+
 .menu__form {
   width: 16rem;
-  margin-top: 3rem;
+  margin: 1rem .5rem;
 }
 
 @media screen and (min-width: 800px) {
@@ -596,7 +625,7 @@ img {
   border-radius: 50%;
   padding: 0.25rem;
   transition: transform 0.2s;
-  z-index: 1;
+  z-index: 10;
   background: #0f0;
 }
 
@@ -717,6 +746,18 @@ img {
 
 .form .dnone {
   display: none;
+}
+
+.form__error{
+  border: solid 1px #f002;
+  box-shadow: .3rem 0rem 2rem #f00e;
+  animation: linear onOf infinite 5s;
+}
+
+@keyframes onOf {
+  50%{
+    box-shadow: .3rem 0 2rem #f007;
+  }
 }
 
 @media screen and (min-width: 800px) {

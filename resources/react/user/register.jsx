@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
 import { Auth } from "../IndexContex";
+import { error } from "laravel-mix/src/Log";
 
 export function Register() {
   const { setPage, setIsAuth } = useContext(Auth);
@@ -11,9 +12,11 @@ export function Register() {
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [errors, setErrors] = useState([]);
 
   function submit(e) {
     e.preventDefault();
+    setErrors([]);
     axios
       .post("/api/user/store", {
         name: name,
@@ -24,12 +27,15 @@ export function Register() {
         repeatPassword: repeatPassword,
       })
       .then((r) => {
-        if (r.data.error) {
-          setGenericError('An generic error is happen');
+        if (r.data.type == "field") {
+          setGenericError("An error with the field is happen");
+          setErrors(r.data.errors);
+        } else if ((r.data, error)) {
+          setGenericError("An generic error is happen");
         } else {
-            localStorage.setItem("token", r.data.token);
-            setIsAuth(true);
-            setPage('home');
+          localStorage.setItem("token", r.data.token);
+          setIsAuth(true);
+          setPage("home");
         }
       })
       .catch((e) => {
@@ -60,7 +66,7 @@ export function Register() {
             id="name"
             type="text"
             placeholder="Your Name"
-            className="form__input"
+            className={errors.name ? "form__input form__error" : "form__input"}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -77,7 +83,7 @@ export function Register() {
             id="lastname"
             type="text"
             placeholder="Lastname"
-            className="form__input"
+            className={errors.lastname ? "form__input form__error" : "form__input"}
             value={lastname}
             onChange={(e) => setLastname(e.target.value)}
           />
@@ -94,7 +100,7 @@ export function Register() {
             id="username"
             type="text"
             placeholder="UserName"
-            className="form__input"
+            className={errors.username ? "form__input form__error" : "form__input"}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -111,7 +117,7 @@ export function Register() {
             id="email"
             type="email"
             placeholder="Email"
-            className="form__input"
+            className={errors.email ? "form__input form__error" : "form__input"}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -128,7 +134,7 @@ export function Register() {
             id="password"
             type="password"
             placeholder="******"
-            className="form__input"
+            className={errors.password ? "form__input form__error" : "form__input"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -145,7 +151,7 @@ export function Register() {
             id="repassword"
             type="password"
             placeholder="******"
-            className="form__input"
+            className={errors.repeatPassword ? "form__input form__error" : "form__input"}
             value={repeatPassword}
             onChange={(e) => setRepeatPassword(e.target.value)}
           />

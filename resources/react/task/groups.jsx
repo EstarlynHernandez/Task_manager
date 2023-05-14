@@ -1,10 +1,12 @@
 import { Auth } from "../IndexContex";
 import React, { useState, useContext } from "react";
+import { useGroup } from "../hooks/useGroups";
 import { Group } from "./group";
 
-export function Groups({ groups, updateGroup, updateTask }) {
-  const { isMenuOpen, setIsMenuOpen, setIsAuth } = useContext(Auth);
+export function Groups({ updateTask }) {
+  const { isMenuOpen, setIsMenuOpen, setIsAuth, isAuth } = useContext(Auth);
   const [name, setName] = useState("");
+  const [groups, updateGroup] = useGroup([]);
   const cgroup = localStorage.getItem("group");
 
   function create(e) {
@@ -24,6 +26,7 @@ export function Groups({ groups, updateGroup, updateTask }) {
     localStorage.removeItem("token");
     setIsAuth(false);
     setIsMenuOpen(false);
+    setPage("login");
   }
 
   return (
@@ -57,48 +60,45 @@ export function Groups({ groups, updateGroup, updateTask }) {
               onClick={setGroup}
               className="listM__link"
               href="/"
-            >
-              Daily Task
+            >{isAuth ?
+              'Daily Task'
+              :
+              'Local Task'
+            }
             </p>
           </li>
-
-          {groups.map((group) => (
-            <Group
-              key={group.id}
-              group={group}
-              setGroup={setGroup}
-            />
-          ))}
+          {isAuth &&
+            groups.map((group) => (
+              <Group
+                key={group.id}
+                group={group}
+                setGroup={setGroup}
+              />
+            ))}
         </ul>
-        <form
-          onSubmit={create}
-          className="form menu__form"
-          method="post"
-          action="/"
-        >
-          <h3 className="form__title">Add</h3>
-
-          <fieldset className="form__set">
-            <input
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
-              placeholder="Name"
-              type="text"
-              id="gName"
-              name="gname"
-              className="form__input"
-            />
-          </fieldset>
-
-          <button
-            type="submit"
-            className="form__button group__button"
+        {isAuth && (
+          <form
+            onSubmit={create}
+            className="form menu__form"
+            method="post"
+            action="/"
           >
-            Create
-          </button>
-        </form>
+            <fieldset className="listM__item listM__create">
+              <input
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+                placeholder="Add Group"
+                type="text"
+                id="gName"
+                name="gname"
+                className="listM__input"
+              />
+            </fieldset>
+            {name && <button className="form__button listM__button">Add</button>}
+          </form>
+        )}
       </div>
       <button
         className="listM__logout"

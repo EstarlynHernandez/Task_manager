@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { Task } from "./task";
-import { useTasks, useGroup } from "../hooks/useTasks";
+import { useTasks } from "../hooks/useTasks";
 import { Create } from "./create";
 import { Groups } from "./groups";
 
 export function Tasks() {
   const [tasks, updateTask] = useTasks([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [groups, updateGroup] = useGroup([]);
 
   
   return (
@@ -20,7 +19,7 @@ export function Tasks() {
       )}
       <div style={isOpen ? { filter: "blur(1rem)" } : {}}>
         <div className="task__header">
-          <h1 className="tasks__title">Your Tasks</h1>
+          <h1 className="tasks__title">Tasks</h1>
           <div
             className="floating__button createTab"
             onClick={() => {
@@ -65,7 +64,7 @@ export function Tasks() {
             ))}
         </ul>
       </div>
-      <Groups groups={groups} updateGroup={updateGroup} updateTask={updateTask}/>
+      <Groups updateTask={updateTask}/>
     </main>
   );
 }

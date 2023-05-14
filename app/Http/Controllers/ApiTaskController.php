@@ -89,15 +89,22 @@ class ApiTaskController extends Controller
             $task->details = $item['details'];
             $task->type = $item['type'];
             if ($item['type'] == 'time') {
-                $task->value = $item['value'] * 60;
+                $task->value = 10;
                 $task->count = $item['value'] * 60;
+                if ($item['value'] != null && floatval($item['value']) > 0) {
+                    $task->value = $item['value'] * 60;
+                    $task->count = $item['value'] * 60;
+                }
             } else if ($item['type'] == 'repeat') {
+                $task->count = 1;
                 $task->value = 0;
-                $task->count = $item['count'];
+                if (is_numeric($item['count'])) {
+                    $task->count = $item['count'];
+                }
             }
             $task->status = false;
             $task->user_id = Auth::user()->id;
-            if(is_numeric(Auth::user()->task_group)){
+            if (is_numeric(Auth::user()->task_group)) {
                 $task->tgroup_id = Auth::user()->task_group;
             }
 

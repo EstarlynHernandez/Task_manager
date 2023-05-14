@@ -7,6 +7,7 @@ export function Header() {
   function logout() {
     localStorage.removeItem("token");
     setIsAuth(false);
+    setPage('login');
   }
   return (
     <header>
