@@ -33,7 +33,7 @@ class TaskController extends Controller
             ]);
         }
 
-        return view('tasks/index');
+        return view('base');
     }
 
     public function check(Request $request)
