@@ -6,14 +6,13 @@ import { Group } from "./group";
 export function Groups({ updateTask }) {
   const { isMenuOpen, setIsMenuOpen, setIsAuth, isAuth } = useContext(Auth);
   const [name, setName] = useState("");
-  const [groups, updateGroup] = useGroup([]);
-  const cgroup = localStorage.getItem("group");
+  const [groups, updateGroup, current] = useGroup([]);
 
   function create(e) {
     e.preventDefault();
     if (name) {
       setName("");
-      updateGroup("create", { name: name });
+      updateGroup("create", { name: name, run: updateTask });
     }
   }
 
@@ -54,7 +53,7 @@ export function Groups({ updateTask }) {
       </div>
       <div className="userG">
         <ul className="listM">
-          <li className={cgroup == "daily" ? "listM__item listM__open" : "listM__item"}>
+          <li className={current == "daily" ? "listM__item listM__open" : "listM__item"}>
             <p
               id="daily"
               onClick={setGroup}
@@ -72,7 +71,9 @@ export function Groups({ updateTask }) {
               <Group
                 key={group.id}
                 group={group}
-                setGroup={setGroup}
+                updateTask={updateTask}
+                updateGroup={updateGroup}
+                current={current}
               />
             ))}
         </ul>

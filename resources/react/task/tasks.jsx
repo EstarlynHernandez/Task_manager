@@ -7,8 +7,21 @@ import { Groups } from "./groups";
 export function Tasks() {
   const [tasks, updateTask] = useTasks([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState("");
 
-  
+  function newTask(e) {
+    e.preventDefault();
+    let task = {
+      name: name,
+      type: "normal",
+      details: null,
+    };
+    if(name.length >= 3){
+      updateTask("create", task);
+      setName('');
+    }
+  }
+
   return (
     <main className="content">
       {isOpen && (
@@ -53,18 +66,42 @@ export function Tasks() {
           </div>
         </div>
         <ul className="tasks continer">
-          {tasks.length > 0 &&
-            tasks.map((task) => (
-              task &&
-              <Task
-                key={task.id}
-                task={task}
-                updateTask={updateTask}
+          <li className="task__list">
+            <form
+              action=""
+              className="task__form task"
+              onSubmit={newTask}
+            >
+              <p className="task__text">New Task</p>
+              <input
+                placeholder="task name"
+                type="text"
+                className="task__input"
+                value={name}
+                onChange={(e) => {setName(e.target.value)}}
               />
-            ))}
+              <button
+                type="submit"
+                className="task__button--create"
+              >
+                Create
+              </button>
+            </form>
+          </li>
+          {tasks.length > 0 &&
+            tasks.map(
+              (task) =>
+                task && (
+                  <Task
+                    key={task.id}
+                    task={task}
+                    updateTask={updateTask}
+                  />
+                )
+            )}
         </ul>
       </div>
-      <Groups updateTask={updateTask}/>
+      <Groups updateTask={updateTask} />
     </main>
   );
 }

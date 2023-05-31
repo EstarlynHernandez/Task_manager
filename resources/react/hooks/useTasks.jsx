@@ -111,8 +111,8 @@ export function useTasks(initialState) {
           name: item.name,
           details: item.details,
           type: item.type,
-          count: item.repeat,
-          value: item.time,
+          count: item.count,
+          value: item.value,
         },
         {
           headers: {
@@ -137,6 +137,13 @@ export function useTasks(initialState) {
           if (!items[count]) {
             item.id = count;
             item.status = false;
+            item.created_at = new Date();
+            if(item.type == 'time'){
+              item.value = parseFloat(item.value) * 60;
+            }else if(item.type == 'repeat'){
+              item.count = parseInt(item.count);
+              item.value = 0;
+            }
             items[count] = item;
             condition = false;
             localStorage.setItem("task", JSON.stringify(items));
