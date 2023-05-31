@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export function Task({ task, updateTask }) {
   const [mouseX, setMouseX] = useState(0);
   const [newMouseX, setNewMouseX] = useState(0);
   const [left, setLeft] = useState(0);
+  const [value, setValue] = useState(task.value);
+  const [interval, stInterval] = useState("interval");
 
+  // move task on mobile for delete
   function touch(e) {
     setMouseX(e.touches[0].screenX);
   }
@@ -23,6 +26,36 @@ export function Task({ task, updateTask }) {
       setLeft(0);
     }
   }
+
+  // extra functions
+  function changeValue() {
+    if (task.type == "repeat") {
+      if (value < task.count) {
+        setValue(value + 1);
+        if (value >= task.count - 1) {
+          updateTask("check", task);
+        }
+      }
+    } else if (task.type === "time") {
+      if (interval == "interval") {
+        stInterval(
+          setInterval(() => {
+            setValue((val) => val - 1);
+          }, 1000)
+        );
+      } else {
+        clearInterval(interval);
+        stInterval("interval");
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (value <= 0 && task.type == "time") {
+      clearInterval(interval);
+      updateTask("check", task);
+    }
+  }, [value]);
 
   return (
     <li
@@ -102,7 +135,10 @@ export function Task({ task, updateTask }) {
           <h3 className="task__title">{task.name.substring(0, 15)}</h3>
           <p className="task__text">{task.details && task.details.substring(0, 20)}</p>
         </div>
-        <div className="task__time taskExtra {{ $task['type'] }}">
+        <div
+          className="task__time taskExtra {{ $task['type'] }}"
+          onClick={changeValue}
+        >
           {task.type == "repeat" && (
             <>
               <h3
@@ -112,7 +148,7 @@ export function Task({ task, updateTask }) {
                 Count
               </h3>
               <p className="task__text">
-                <span className="task__value value">{task.value}</span>-<span className="task__limit value-2">{task.count}</span>
+                <span className="task__value value">{value}</span>-<span className="task__limit value-2">{task.count}</span>
               </p>
             </>
           )}
@@ -125,7 +161,9 @@ export function Task({ task, updateTask }) {
                 Remains
               </h3>
               <p className="task__text">
-                <span className="task__minutes value">{parseInt(task.value / 60)}</span>m <span className="task__seconds value-2">{task.value % 60}</span>s
+                <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 86400) / 3600) + "h"}</span>{" "}
+                <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 3600) / 60) + "m"}</span>{" "}
+                <span className="task__seconds value-2">{value % 60}</span>s
               </p>
             </>
           )}

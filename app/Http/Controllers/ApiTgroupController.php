@@ -6,17 +6,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Tgroup;
 use App\Models\User;
+use App\Models\task;
 
 class ApiTgroupController extends Controller
 {
+
+    private function getGroup()
+    {
+        $tgroups = Tgroup::where('user_id', Auth::user()->id)->get();
+        return $tgroups;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $tgroups = Tgroup::where('user_id', Auth::user()->id)->get();
-
-        return response()->json(['groups' => $tgroups]);
+        return response()->json(['groups' => $this->getGroup(), 'active' => Auth::user()->task_group]);
     }
 
     /**
@@ -44,7 +49,11 @@ class ApiTgroupController extends Controller
 
         $tgroups = Tgroup::where('user_id', Auth::user()->id)->get();
 
-        return response()->json(['groups' => $tgroups]);
+        $user = User::find(Auth::user()->id);
+        $user->task_group = $tgroup->id;
+        $user->save();
+
+        return response()->json(['groups' => $tgroups, 'active' => $tgroup->id]);
     }
 
     public function check(Request $request)
@@ -68,6 +77,7 @@ class ApiTgroupController extends Controller
                     break;
             }
             $user->save();
+            return response()->json(['active' => $user->task_group]);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()]);
         }
@@ -100,8 +110,23 @@ class ApiTgroupController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        try {
+            //code...
+            $tgroup = Tgroup::find($request->id);
+
+            if ($tgroup->user_id == Auth::user()->id) {
+                $tasks = Task::where('tgroup_id', $tgroup->id)->get();
+                foreach ($tasks as $task) {
+                    $task->delete();
+                }
+                $tgroup->delete();
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'error']);
+        }
+
+        return response()->json(['status' => 'complete', 'groups' => $this->getGroup()]);
     }
 }

@@ -6,8 +6,8 @@ export function Create({ setIsOpen, updateTask }) {
     const [name, setName] = useState("");
     const [details, setDetails] = useState("");
     const [type, setType] = useState("normal");
-    const [time, setTime] = useState("");
-    const [repeat, setRepeat] = useState("")
+    const [value, setValue] = useState("");
+    const [count, setCount] = useState("");
 
     function newTask(e) {
         e.preventDefault();
@@ -15,8 +15,8 @@ export function Create({ setIsOpen, updateTask }) {
             name: name,
             details: details,
             type: type,
-            time: time,
-            repeat: repeat
+            value: value,
+            count: count
         }
         updateTask('create', task);
         setIsOpen(false);
@@ -89,8 +89,8 @@ export function Create({ setIsOpen, updateTask }) {
                             name="count"
                             id="times"
                             className="form__input"
-                            value={repeat}
-                            onChange={(e) => setRepeat(e.target.value)}
+                            value={count}
+                            onChange={(e) => setCount(e.target.value)}
                         />
                     </fieldset>
                 }
@@ -109,8 +109,8 @@ export function Create({ setIsOpen, updateTask }) {
                             name="time"
                             id="time"
                             className="form__input"
-                            value={time}
-                            onChange={(e) => setTime(e.target.value)}
+                            value={value}
+                            onChange={(e) => setValue(e.target.value)}
                         />
                     </fieldset>
                 }

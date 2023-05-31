@@ -8,18 +8,18 @@ use Illuminate\Support\Facades\Auth;
 
 class ApiTaskController extends Controller
 {
-    private function getTask($group, $id)
+    private function getTask()
     {
-        switch ($group) {
+        switch (Auth::user()->task_group) {
             case 'daily':
-                $tasks = Task::where('user_id', $id)->where('tgroup_id', null)->get();
+                $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('tgroup_id', null)->get();
                 break;
             default:
                 try {
                     //code...
-                    $tasks = Task::where('user_id', $id)->where('tgroup_id', $group)->get();
+                    $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('tgroup_id', Auth::user()->task_group)->get();
                 } catch (\Throwable $th) {
-                    $tasks = Task::where('user_id', $id)->where('tgroup_id', null)->get();
+                    $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('tgroup_id', null)->get();
                     //throw $th;
                 }
                 break;
@@ -34,7 +34,7 @@ class ApiTaskController extends Controller
         try {
             //code...
             return response()->json([
-                'tasks' => $this->getTask(Auth::user()->task_group, Auth::user()->id),
+                'tasks' => $this->getTask(),
             ]);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()]);
@@ -58,7 +58,7 @@ class ApiTaskController extends Controller
 
         return response()->json([
             'status' => 'complete',
-            'tasks' => $this->getTask(Auth::user()->task_group, Auth::user()->id),
+            'tasks' => $this->getTask(),
         ]);
     }
 
@@ -113,8 +113,8 @@ class ApiTaskController extends Controller
             return response()->json(['tasks' => $this->getTask(Auth::user()->task_group, Auth::user()->id)]);
         } catch (\Throwable $th) {
             return response()->json([
-                'tasks' => $this->getTask(Auth::user()->task_group, Auth::user()->id),
-                'error' => true,
+                'tasks' => $this->getTask(),
+                'error' => $th->getMessage(),
             ]);
         }
     }
@@ -153,13 +153,12 @@ class ApiTaskController extends Controller
             $task = Task::find($request->id);
 
             if ($task->user_id == Auth::user()->id) {
-                $task->status = !$task->status;
                 $task->delete();
             }
         } catch (\Throwable $th) {
             return response()->json(['error' => 'error']);
         }
 
-        return response()->json(['status' => 'complete', 'tasks' => $this->getTask(Auth::user()->task_group, Auth::user()->id)]);
+        return response()->json(['status' => 'complete', 'tasks' => $this->getTask()]);
     }
 }

@@ -4,29 +4,24 @@ import { Auth } from "../IndexContex";
 
 export function useGroup(initialState) {
   const [groups, setGroups] = useState(initialState);
+  const [current, setCurrent] = useState("");
   const { isAuth } = useContext(Auth);
 
   useEffect(() => {
-    if (isAuth) {
-      Axios.get("/api/group", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-          Accept: "aplication/json",
-        },
+    Axios.get("/api/group", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+        Accept: "aplication/json",
+      },
+    })
+      .then((r) => {
+        (r) => r.json;
+        setGroups(r.data.groups);
+        setCurrent(r.data.active);
       })
-        .then((r) => {
-          (r) => r.json;
-          setGroups(r.data.groups);
-        })
-        .catch((r) => {
-          console.log("error");
-        });
-    } else {
-      const localTask = localStorage.getItem("groups");
-      if (localTask) {
-        setGroups(JSON.parse(localTask));
-      }
-    }
+      .catch((r) => {
+        console.log("error");
+      });
   }, []);
 
   function Delete(item) {
@@ -41,6 +36,7 @@ export function useGroup(initialState) {
     })
       .then((response) => response.data)
       .then((data) => {
+        item.run("update");
         setGroups(data.groups);
       })
       .catch((error) => {
@@ -64,6 +60,8 @@ export function useGroup(initialState) {
       .then((response) => response.data)
       .then((res) => {
         setGroups(res.groups);
+        setCurrent(res.active);
+        item.run('update');
       })
       .catch((error) => {
         console.log(error);
@@ -82,12 +80,13 @@ export function useGroup(initialState) {
           Accept: "application/json",
         },
       }
-    ).then(() => {
+    ).then((r) => {
       item.run("update");
+      setCurrent(r.data.active);
     });
   }
 
-  function updateTask(action, item) {
+  function updateGroup(action, item) {
     switch (action) {
       case "create":
         if (isAuth) {
@@ -109,5 +108,5 @@ export function useGroup(initialState) {
     }
   }
 
-  return [groups, updateTask];
+  return [groups, updateGroup, current];
 }

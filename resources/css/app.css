@@ -313,10 +313,6 @@ form .listM__create{
   margin-bottom: 1rem;
 }
 
-form .listM__create:focus-within{
-  transform: scale(1.5);
-}
-
 
 .menu__form .listM__button{
   margin: .5rem auto;
@@ -393,9 +389,7 @@ form .listM__create:focus-within{
   .listM__logout {
     display: none;
   }
-  /* .blur{
-        filter: blur(0);
-    } */
+
   .body {
     max-width: 1200px;
   }
@@ -527,6 +521,30 @@ form .listM__create:focus-within{
 
 .task__complete .circle {
   stroke: #93ed07;
+}
+
+.task__button--create{
+  background-color: #080;
+  border: none;
+  padding: .8rem 1.5rem;
+  color: var(--white);
+  border-radius: 1.2rem;
+  font-size: 1.5rem;
+  outline: none;
+}
+
+.task__input{
+  height: 2rem;
+  width: 50%;
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.task__input::placeholder{
+  color: #0005;
 }
 
 @keyframes TaskDance {
