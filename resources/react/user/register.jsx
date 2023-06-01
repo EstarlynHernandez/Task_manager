@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
 import { Auth } from "../IndexContex";
-import { error } from "laravel-mix/src/Log";
 
 export function Register() {
   const { setPage, setIsAuth } = useContext(Auth);
@@ -30,7 +29,7 @@ export function Register() {
         if (r.data.type == "field") {
           setGenericError("An error with the field is happen");
           setErrors(r.data.errors);
-        } else if ((r.data, error)) {
+        } else if ((r.data.error)) {
           setGenericError("An generic error is happen");
         } else {
           localStorage.setItem("token", r.data.token);

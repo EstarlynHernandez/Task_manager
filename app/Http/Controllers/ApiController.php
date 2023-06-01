@@ -89,7 +89,7 @@ class ApiController extends Controller
             return response()->json(['error' => true, 'type' => 'field', 'errors' => $e->errors()]);
         } catch (\Throwable $th) {
             //throw $th;
-            return response()->json(['error' => true, 'type' => 'generic']);
+            return response()->json(['error' => $th, 'type' => 'generic']);
         }
     }
 

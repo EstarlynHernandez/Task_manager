@@ -29,23 +29,25 @@ export function Task({ task, updateTask }) {
 
   // extra functions
   function changeValue() {
-    if (task.type == "repeat") {
-      if (value < task.count) {
-        setValue(value + 1);
-        if (value >= task.count - 1) {
-          updateTask("check", task);
+    if (!task.status) {
+      if (task.type == "repeat") {
+        if (value < task.count) {
+          setValue(value + 1);
+          if (value >= task.count - 1) {
+            check();
+          }
         }
-      }
-    } else if (task.type === "time") {
-      if (interval == "interval") {
-        stInterval(
-          setInterval(() => {
-            setValue((val) => val - 1);
-          }, 1000)
-        );
-      } else {
-        clearInterval(interval);
-        stInterval("interval");
+      } else if (task.type === "time") {
+        if (interval == "interval") {
+          stInterval(
+            setInterval(() => {
+              setValue((val) => val - 1);
+            }, 1000)
+          );
+        } else {
+          clearInterval(interval);
+          stInterval("interval");
+        }
       }
     }
   }
@@ -53,9 +55,21 @@ export function Task({ task, updateTask }) {
   useEffect(() => {
     if (value <= 0 && task.type == "time") {
       clearInterval(interval);
-      updateTask("check", task);
+      check();
     }
   }, [value]);
+
+  function check() {
+    updateTask("check", task);
+    if(task.status){
+      if(task.type == 'repeat'){
+        setValue(0);
+      }else if(task.type == 'time'){
+        setValue(task.count)
+      }
+    }
+    stInterval("interval");
+  }
 
   return (
     <li
@@ -72,9 +86,7 @@ export function Task({ task, updateTask }) {
       >
         <div
           className="task__checked checked"
-          onClick={() => {
-            updateTask("check", task);
-          }}
+          onClick={check}
         >
           <form
             action=""
