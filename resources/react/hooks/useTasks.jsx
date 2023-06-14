@@ -10,6 +10,7 @@ export function useTasks(initialState) {
 
   // get Task
   function getTask() {
+    // online
     if (isAuth) {
       Axios.get("/api/task/", {
         headers: {
@@ -25,6 +26,7 @@ export function useTasks(initialState) {
           localStorage.removeItem("token");
         });
     } else {
+      // Offline
       const localTask = localStorage.getItem("task");
       if (localTask) {
         setTask(JSON.parse(localTask));
@@ -34,6 +36,7 @@ export function useTasks(initialState) {
 
   // check Task
   function Check(item) {
+    // Online
     if (isAuth) {
       Axios.put(
         "api/task/check",
@@ -55,6 +58,7 @@ export function useTasks(initialState) {
           console.log(error);
         });
     } else {
+      // Offline
       let items = JSON.parse(localStorage.getItem("task"));
       items.forEach((element) => {
         if (element) {
@@ -70,6 +74,7 @@ export function useTasks(initialState) {
 
   // Delete Task
   function Delete(item) {
+    // online delete
     if (isAuth) {
       Axios.delete("api/task/delete", {
         headers: {
@@ -83,11 +88,13 @@ export function useTasks(initialState) {
         .then((response) => response.data)
         .then((data) => {
           setTask(data.tasks);
+          item.run(false);
         })
         .catch((error) => {
           console.log(error);
         });
     } else {
+      // offline delete
       let items = JSON.parse(localStorage.getItem("task"));
       let newItems = [];
       items.forEach((element) => {
@@ -100,10 +107,12 @@ export function useTasks(initialState) {
       localStorage.setItem("task", JSON.stringify(newItems));
       setTask(newItems);
     }
+    item.run(false);
   }
 
   // Create Task
   function Create(item) {
+    // online
     if (isAuth) {
       Axios.post(
         "api/task/store",
@@ -124,11 +133,16 @@ export function useTasks(initialState) {
         .then((response) => response.data)
         .then((res) => {
           setTask(res.tasks);
+          if(!res.error){
+            item.run(false);
+          }
+          console.log(res);
         })
         .catch((error) => {
           console.log(error);
         });
     } else {
+      // offline
       let items = JSON.parse(localStorage.getItem("task"));
       if (items) {
         let condition = true;
@@ -138,9 +152,9 @@ export function useTasks(initialState) {
             item.id = count;
             item.status = false;
             item.created_at = new Date();
-            if(item.type == 'time'){
+            if (item.type == "time") {
               item.value = parseFloat(item.value) * 60;
-            }else if(item.type == 'repeat'){
+            } else if (item.type == "repeat") {
               item.count = parseInt(item.count);
               item.value = 0;
             }
@@ -159,6 +173,7 @@ export function useTasks(initialState) {
         localStorage.setItem("task", JSON.stringify(items));
         setTask(items);
       }
+      item.run(false);
     }
   }
 

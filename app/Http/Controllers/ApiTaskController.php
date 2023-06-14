@@ -77,10 +77,10 @@ class ApiTaskController extends Controller
     {
         try {
             $item = $request->validate([
-                'name' => ['required', 'max:20', 'regex:/^[\pL\s\d]+$/u'],
-                'details' => ['nullable', 'max:512', 'regex:/^[\pL\s\d\.,\:;\-_]+$/u'],
+                'name' => ['required', 'max:36', 'min:3', 'regex:/^[\pL\s\d]+$/u'],
+                'details' => ['nullable', 'max:512','min:3', 'regex:/^[\pL\s\d\.,\:;\-_]+$/u'],
                 'type' => ['required', 'max:512', 'regex:/^[\pL]+$/u'],
-                'count' => ['nullable', 'numeric', 'max:999'],
+                'count' => ['nullable', 'numeric', 'max:9999'],
                 'value' => ['nullable', 'numeric', 'max:1440'],
             ]);
 

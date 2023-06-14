@@ -1,37 +1,58 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Task } from "./task";
 import { useTasks } from "../hooks/useTasks";
 import { Create } from "./create";
 import { Groups } from "./groups";
-import { error } from "laravel-mix/src/Log";
+import { Auth } from "../IndexContex";
 
 export function Tasks() {
   const [tasks, updateTask] = useTasks([]);
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
+  const { isMenuOpen, filterString } = useContext(Auth);
+  const [taskNameError, setTaskNameError] = useState(false);
+  const [tasksLoading, setTasksLoading] = useState(false);
 
+  filterString("string", "min:12|max:2|number");
   function newTask(e) {
     e.preventDefault();
+    setTasksLoading(true);
     let task = {
       name: name,
       type: "normal",
       details: null,
+      run: setTasksLoading,
     };
-    if(name.length >= 3){
+    if (name.length >= 3) {
       updateTask("create", task);
-      setName('');
+      setName("");
+    } else {
+      setTaskNameError(true);
     }
   }
 
+  function ThisName(e) {
+    if ((e.target.value.length < 1) | (e.target.value.length > 2)) {
+      setTaskNameError(false);
+    } else {
+      setTaskNameError(true);
+    }
+    setName(e.target.value);
+  }
+
   return (
-    <main className="content">
+    <main className={"content"}>
       {isOpen && (
         <Create
           setIsOpen={setIsOpen}
           updateTask={updateTask}
+          setTasksLoading={setTasksLoading}
         />
       )}
-      <div style={isOpen ? { filter: "blur(1rem)" } : {}}>
+      <div
+        style={isOpen ? { filter: "blur(1rem)" } : {}}
+        className={isMenuOpen ? "mBlur" : "tasks--container"}
+      >
         <div className="task__header">
           <h1 className="tasks__title">Tasks</h1>
           <div
@@ -66,7 +87,8 @@ export function Tasks() {
             </svg>
           </div>
         </div>
-        <ul className="tasks continer">
+
+        <ul className={"tasks continer " + (tasksLoading ? "loading" : "")}>
           <li className="task__list">
             <form
               action=""
@@ -77,9 +99,9 @@ export function Tasks() {
               <input
                 placeholder="task name"
                 type="text"
-                className="task__input"
+                className={taskNameError ? "task__input form__error error" : "task__input"}
                 value={name}
-                onChange={(e) => {setName(e.target.value)}}
+                onChange={ThisName}
               />
               <button
                 type="submit"
@@ -88,6 +110,7 @@ export function Tasks() {
                 Create
               </button>
             </form>
+            {taskNameError && <p className="error__text">Task name need 3 or most words</p>}
           </li>
           {tasks.length > 0 &&
             tasks.map(
@@ -97,12 +120,31 @@ export function Tasks() {
                     key={task.id}
                     task={task}
                     updateTask={updateTask}
+                    setTasksLoading={setTasksLoading}
                   />
                 )
             )}
         </ul>
+        {tasksLoading && (
+          <div className="loading--icon">
+            <svg
+              fill="transparent"
+              viewBox="0 0 100 100"
+            >
+              <circle
+                cx={50}
+                cy={50}
+                r={40}
+                stroke="white"
+                strokeLinecap="round"
+                strokeDasharray="140 251"
+                strokeWidth="1rem"
+              />
+            </svg>
+          </div>
+        )}
       </div>
-      <Groups updateTask={updateTask} />
+      <Groups updateTask={updateTask} setTasksLoading={setTasksLoading} />
     </main>
   );
 }

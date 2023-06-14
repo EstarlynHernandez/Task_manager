@@ -8,20 +8,22 @@ export function useGroup(initialState) {
   const { isAuth } = useContext(Auth);
 
   useEffect(() => {
-    Axios.get("/api/group", {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-        Accept: "aplication/json",
-      },
-    })
-      .then((r) => {
-        (r) => r.json;
-        setGroups(r.data.groups);
-        setCurrent(r.data.active);
+    if (isAuth) {
+      Axios.get("/api/group", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          Accept: "aplication/json",
+        },
       })
-      .catch((r) => {
-        console.log("error");
-      });
+        .then((r) => {
+          (r) => r.json;
+          setGroups(r.data.groups);
+          setCurrent(r.data.active);
+        })
+        .catch((r) => {
+          console.log("error");
+        });
+    }
   }, []);
 
   function Delete(item) {
@@ -36,7 +38,7 @@ export function useGroup(initialState) {
     })
       .then((response) => response.data)
       .then((data) => {
-        item.run("update");
+        item.run(false);
         setGroups(data.groups);
       })
       .catch((error) => {
@@ -61,7 +63,7 @@ export function useGroup(initialState) {
       .then((res) => {
         setGroups(res.groups);
         setCurrent(res.active);
-        item.run('update');
+        item.run(false);
       })
       .catch((error) => {
         console.log(error);
@@ -81,7 +83,7 @@ export function useGroup(initialState) {
         },
       }
     ).then((r) => {
-      item.run("update");
+      item.run(false);
       setCurrent(r.data.active);
     });
   }
@@ -107,6 +109,6 @@ export function useGroup(initialState) {
         break;
     }
   }
-
+  // console.log(isAuth);
   return [groups, updateGroup, current];
 }

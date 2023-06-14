@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export function Task({ task, updateTask }) {
+export function Task({ task, updateTask, setTasksLoading }) {
   const [mouseX, setMouseX] = useState(0);
   const [newMouseX, setNewMouseX] = useState(0);
   const [left, setLeft] = useState(0);
@@ -61,14 +61,21 @@ export function Task({ task, updateTask }) {
 
   function check() {
     updateTask("check", task);
-    if(task.status){
-      if(task.type == 'repeat'){
+    if (task.status) {
+      if (task.type == "repeat") {
         setValue(0);
-      }else if(task.type == 'time'){
-        setValue(task.count)
+      } else if (task.type == "time") {
+        setValue(task.count);
       }
     }
+    clearInterval(interval);
     stInterval("interval");
+  }
+
+  function deleteTask(task){
+    setTasksLoading(true);
+    task.run = setTasksLoading;
+    updateTask('delete', task);
   }
 
   return (
@@ -183,7 +190,7 @@ export function Task({ task, updateTask }) {
         <div className="close delete delete-desktop">
           <p
             onClick={() => {
-              updateTask("delete", task);
+              deleteTask(task);
             }}
           >
             Delete
@@ -193,7 +200,7 @@ export function Task({ task, updateTask }) {
       <div className="task__delete delete">
         <p
           onClick={() => {
-            updateTask("delete", task);
+            deleteTask(task);
           }}
         >
           Remove

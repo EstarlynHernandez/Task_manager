@@ -1,24 +1,28 @@
 import { Auth } from "../IndexContex";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useGroup } from "../hooks/useGroups";
 import { Group } from "./group";
 
-export function Groups({ updateTask }) {
+export function Groups({ updateTask, setTasksLoading }) {
   const { isMenuOpen, setIsMenuOpen, setIsAuth, isAuth } = useContext(Auth);
   const [name, setName] = useState("");
   const [groups, updateGroup, current] = useGroup([]);
+  const [groupNameError, setGroupNameError] = useState(false);
+  const [groupLoading, setGroupLoading] = useState(false);
 
   function create(e) {
     e.preventDefault();
-    if (name) {
+    if (name.length > 2) {
       setName("");
-      updateGroup("create", { name: name, run: updateTask });
+      loading("all");
+      updateGroup("create", { name: name, run: runSet });
     }
   }
 
   function setGroup(e) {
-    localStorage.setItem("group", e.target.id);
-    updateGroup("check", { id: e.target.id, run: updateTask });
+    setGroupLoading(e.target.id);
+    setTasksLoading(true);
+    updateGroup("check", { id: e.target.id, run: runSet });
   }
 
   function logout() {
@@ -26,6 +30,29 @@ export function Groups({ updateTask }) {
     setIsAuth(false);
     setIsMenuOpen(false);
     setPage("login");
+  }
+
+  function newGroup(e) {
+    if ((e.target.value.length < 1) | (e.target.value.length > 2)) {
+      setGroupNameError(false);
+    } else {
+      setGroupNameError(true);
+    }
+    setName(e.target.value);
+  }
+
+  function loading(group) {
+    setGroupLoading(group);
+    if (group) {
+      setTasksLoading(true);
+    } else {
+      setTasksLoading(false);
+    }
+  }
+
+  function runSet() {
+    updateTask("update");
+    loading(false);
   }
 
   return (
@@ -51,20 +78,35 @@ export function Groups({ updateTask }) {
           <p>Close</p>
         </div>
       </div>
-      <div className="userG">
-        <ul className="listM">
-          <li className={current == "daily" ? "listM__item listM__open" : "listM__item"}>
+      <div className={"userG"}>
+        <ul className={"listM " + (groupLoading == "all" ? "loading" : "")}>
+          <li className={current == "daily" ? "listM__item listM__open " : "listM__item "}>
             <p
               id="daily"
               onClick={setGroup}
-              className="listM__link"
+              className={"listM__link " + (groupLoading == "daily" && "loading")}
               href="/"
-            >{isAuth ?
-              'Daily Task'
-              :
-              'Local Task'
-            }
+            >
+              {isAuth ? "Daily Task" : "Local Task"}
             </p>
+            {groupLoading == 'daily' && (
+              <div className="groupLoading--icon">
+                <svg
+                  fill="transparent"
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    cx={50}
+                    cy={50}
+                    r={40}
+                    stroke="white"
+                    strokeLinecap="round"
+                    strokeDasharray="140 251"
+                    strokeWidth="1rem"
+                  />
+                </svg>
+              </div>
+            )}
           </li>
           {isAuth &&
             groups.map((group) => (
@@ -74,6 +116,8 @@ export function Groups({ updateTask }) {
                 updateTask={updateTask}
                 updateGroup={updateGroup}
                 current={current}
+                loading={loading}
+                groupLoading={groupLoading}
               />
             ))}
         </ul>
@@ -87,17 +131,16 @@ export function Groups({ updateTask }) {
             <fieldset className="listM__item listM__create">
               <input
                 value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
+                onChange={newGroup}
                 placeholder="Add Group"
                 type="text"
                 id="gName"
                 name="gname"
-                className="listM__input"
+                className={"listM__input " + (groupNameError && "error")}
               />
             </fieldset>
-            {name && <button className="form__button listM__button">Add</button>}
+            {groupNameError && <p className="error__text">Group name need 3 or most words</p>}
+            {name.length > 2 && <button className="form__button listM__button">Add</button>}
           </form>
         )}
       </div>
