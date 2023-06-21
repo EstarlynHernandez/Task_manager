@@ -42,11 +42,14 @@ export function Groups({ updateTask, setTasksLoading }) {
   }
 
   function loading(group) {
-    setGroupLoading(group);
     if (group) {
+      setGroupLoading(group);
       setTasksLoading(true);
     } else {
-      setTasksLoading(false);
+      setTimeout(() => {
+        setGroupLoading(group);
+        setTasksLoading(false);
+      }, 400);
     }
   }
 
@@ -87,9 +90,9 @@ export function Groups({ updateTask, setTasksLoading }) {
               className={"listM__link " + (groupLoading == "daily" && "loading")}
               href="/"
             >
-              {isAuth ? "Daily Task" : "Local Task"}
+              {isAuth ? "Task" : "Local Task"}
             </p>
-            {groupLoading == 'daily' && (
+            {groupLoading == "daily" && (
               <div className="groupLoading--icon">
                 <svg
                   fill="transparent"

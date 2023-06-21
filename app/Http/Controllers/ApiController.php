@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use DateTime;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,25 +27,34 @@ class ApiController extends Controller
             ]);
 
             if (Auth::attempt($credentials)) {
-                $tokenDel = Auth::user()->tokens()
-                    ->where('name', 'estyos Task')
-                    ->first();
-                $tokenDel->delete();
-                $token = Auth::user()->createToken('estyos task')->plainTextToken;
+                if ($request['device']) {
+                    $deviceName = $request['device'];
+                    $tokenDel = Auth::user()->tokens()
+                        ->where('name', $request['device'])
+                        ->first();
+                    if ($tokenDel) {
+                        $tokenDel->delete();
+                    }
+                    $token = Auth::user()->createToken($request['device'])->plainTextToken;
+                } else {
+                    $deviceName = 'Device' . random_int(00001, 99999) . (new DateTime())->format('dmyhms');
+                    $token = Auth::user()->createToken($deviceName)->plainTextToken;
+                }
                 return response()->json([
                     'error' => false,
                     'token' => $token,
+                    'deviceName' => $deviceName,
                 ]);
             } else {
                 return response()->json([
                     'error' => true,
                     'message' => 'your email or password are wrong',
-                    'type' => 'credentials'
+                    'type' => 'credentials',
                 ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');;
             }
         } catch (\Throwable $th) {
             return response()->json([
-                'error' => true,
+                'error' => $th->getMessage(),
                 'type' => 'field'
             ]);
         }
@@ -79,12 +89,17 @@ class ApiController extends Controller
             $user->username = $userData['username'];
             $user->email = $userData['email'];
             $user->password = $userData['password'];
+            if ($request['device']) {
+                $deviceName = $request['device'];
+            } else {
+                $deviceName = 'Device' . random_int(00001, 99999) . (new DateTime())->format('dmyhms');
+            }
 
             $user->save();
 
-            $token = $user->createToken('estyos Task')->plainTextToken;
+            $token = $user->createToken($deviceName)->plainTextToken;
 
-            return response()->json(['error' => false, 'token' => $token]);
+            return response()->json(['error' => false, 'token' => $token, 'deviceName' => $deviceName]);
         } catch (ValidationException $e) {
             return response()->json(['error' => true, 'type' => 'field', 'errors' => $e->errors()]);
         } catch (\Throwable $th) {

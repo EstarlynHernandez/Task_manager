@@ -786,6 +786,10 @@ form .listM__create {
   animation: linear onOf infinite 5s;
 }
 
+.form__filters {
+  display: flex;
+}
+
 @keyframes onOf {
   50% {
     box-shadow: 0.3rem 0 2rem #f007;
@@ -862,18 +866,18 @@ form .listM__create {
   box-shadow: var(--danger) 0 0 1rem;
 }
 
-.error__field{
+.error__field {
   color: red;
   font-weight: bold;
 }
 
 /* loading */
-.loading{
-  filter: blur(.5rem);
-  opacity: .3;
+.loading {
+  filter: blur(0.5rem);
+  opacity: 0.3;
 }
 
-.loading--icon{
+.loading--icon {
   display: block;
   position: absolute;
   top: calc(20% - 2rem);
@@ -884,20 +888,19 @@ form .listM__create {
   animation: round 1s infinite linear;
 }
 
-
 @keyframes round {
-  0%{
+  0% {
     transform: rotate(0);
   }
-  50%{
+  50% {
     transform: rotate(180deg);
   }
-  100%{
+  100% {
     transform: rotate(360deg);
   }
 }
 
-.groupLoading--icon{
+.groupLoading--icon {
   position: absolute;
   width: 2rem;
   height: 2rem;
@@ -905,4 +908,22 @@ form .listM__create {
   right: calc(50% - 1rem);
   z-index: 10;
   animation: round 1s infinite linear;
+}
+
+.alert-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+.alert-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms, transform 300ms;
+}
+.alert-exit {
+  opacity: 1;
+}
+.alert-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 300ms, transform 300ms;
 }

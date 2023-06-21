@@ -11,10 +11,12 @@ export function Login() {
 
   function submit(e) {
     e.preventDefault();
+    console.log(password, email)
     axios
       .post("/api/login", {
         password: password,
         email: email,
+        device: localStorage.getItem('device'),
       })
       .then((r) => {
         if (r.data.error) {
@@ -27,6 +29,7 @@ export function Login() {
           localStorage.setItem("token", r.data.token);
           setIsAuth(true);
           setPage("home");
+          localStorage.setItem('device', r.data.deviceName);
         }
       })
       .catch((e) => {
@@ -93,7 +96,7 @@ export function Login() {
             placeholder="Password"
             className="form__input"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setValue(setPassword, "min:3", e.target)}
           />
         </fieldset>
 

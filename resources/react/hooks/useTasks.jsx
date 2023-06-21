@@ -4,7 +4,7 @@ import { Auth } from "../IndexContex";
 
 export function useTasks(initialState) {
   const [tasks, setTask] = useState(initialState);
-  const { isAuth } = useContext(Auth);
+  const { isAuth, setIsAuth } = useContext(Auth);
 
   useEffect(getTask, []);
 
@@ -12,7 +12,7 @@ export function useTasks(initialState) {
   function getTask() {
     // online
     if (isAuth) {
-      Axios.get("/api/task/", {
+      Axios.get("/api/task/" + localStorage.getItem("device"), {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
           Accept: "aplication/json",
@@ -21,9 +21,11 @@ export function useTasks(initialState) {
         .then((r) => {
           (r) => r.json;
           setTask(r.data.tasks);
+          localStorage.setItem("token", r.data.token);
         })
         .catch((r) => {
           localStorage.removeItem("token");
+          setIsAuth(false);
         });
     } else {
       // Offline
@@ -133,10 +135,9 @@ export function useTasks(initialState) {
         .then((response) => response.data)
         .then((res) => {
           setTask(res.tasks);
-          if(!res.error){
+          if (!res.error) {
             item.run(false);
           }
-          console.log(res);
         })
         .catch((error) => {
           console.log(error);
@@ -177,6 +178,99 @@ export function useTasks(initialState) {
     }
   }
 
+  // set a value for task
+  function SetValue(item) {
+    // online
+    if (isAuth) {
+      Axios.post(
+        "api/task/value",
+        {
+          id: item.id,
+          value: item.value,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            Accept: "application/json",
+          },
+        }
+      )
+        .then((response) => response.data)
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }
+
+  function Edit(item) {
+    // online
+    if (isAuth) {
+      Axios.put(
+        "api/task/update",
+        {
+          name: item.name,
+          details: item.details,
+          type: item.type,
+          count: item.count,
+          value: item.value,
+          id: item.id,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            Accept: "application/json",
+          },
+        }
+      )
+        .then((response) => response.data)
+        .then((res) => {
+          setTask(res.tasks);
+          console.log(res);
+          if (!res.error) {
+            item.run(false);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      // offline
+      let items = JSON.parse(localStorage.getItem("task"));
+      if (items) {
+        let condition = true;
+        let count = 1;
+        while (condition) {
+          if (count == item.id) {
+            item.status = false;
+            if (item.type == "time") {
+              item.value = parseFloat(item.value) * 60;
+            } else if (item.type == "repeat") {
+              item.count = parseInt(item.count);
+              item.value = 0;
+            }
+            items[count] = item;
+            condition = false;
+            localStorage.setItem("task", JSON.stringify(items));
+            setTask(items);
+          }
+          count++;
+          if (count > 500) {
+            console.log(items);
+            condition = false;
+          }
+        }
+      } else {
+        item.id = 0;
+        item.status = false;
+        items = [];
+        items[0] = item;
+        localStorage.setItem("task", JSON.stringify(items));
+        setTask(items);
+      }
+      item.run(false);
+    }
+  }
+
   // Select an Action for a task
   function updateTask(action, item) {
     switch (action) {
@@ -186,12 +280,20 @@ export function useTasks(initialState) {
       case "create":
         Create(item);
         break;
+      case "edit":
+        Edit(item);
+        break;
       case "delete":
         Delete(item);
         break;
       case "update":
         if (isAuth) {
           getTask();
+        }
+        break;
+      case "value":
+        if (isAuth) {
+          SetValue(item);
         }
         break;
       default:

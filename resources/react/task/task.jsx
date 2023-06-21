@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export function Task({ task, updateTask, setTasksLoading }) {
+export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
   const [mouseX, setMouseX] = useState(0);
   const [newMouseX, setNewMouseX] = useState(0);
   const [left, setLeft] = useState(0);
@@ -27,11 +27,19 @@ export function Task({ task, updateTask, setTasksLoading }) {
     }
   }
 
+  function saveValue() {
+    var item = [];
+    item.value = value;
+    item.id = task.id;
+    updateTask("value", item);
+  }
+
   // extra functions
   function changeValue() {
     if (!task.status) {
       if (task.type == "repeat") {
         if (value < task.count) {
+          saveValue();
           setValue(value + 1);
           if (value >= task.count - 1) {
             check();
@@ -46,6 +54,7 @@ export function Task({ task, updateTask, setTasksLoading }) {
           );
         } else {
           clearInterval(interval);
+          saveValue();
           stInterval("interval");
         }
       }
@@ -55,6 +64,7 @@ export function Task({ task, updateTask, setTasksLoading }) {
   useEffect(() => {
     if (value <= 0 && task.type == "time") {
       clearInterval(interval);
+      saveValue();
       check();
     }
   }, [value]);
@@ -72,140 +82,140 @@ export function Task({ task, updateTask, setTasksLoading }) {
     stInterval("interval");
   }
 
-  function deleteTask(task){
+  function deleteTask(task) {
     setTasksLoading(true);
     task.run = setTasksLoading;
-    updateTask('delete', task);
+    updateTask("delete", task);
   }
 
   return (
-    <li
-      id="id"
-      className={!task.status ? "tasks__list" : "tasks__list task__complete"}
-      key={task.id}
-    >
-      <div
-        className="task"
-        onTouchStart={touch}
-        onTouchEnd={endTouch}
-        onTouchMove={touchMove}
-        style={{ left: left + "px" }}
+      <li
+        id="id"
+        className={!task.status ? "tasks__list" : "tasks__list task__complete"}
+        key={task.id}
       >
         <div
-          className="task__checked checked"
-          onClick={check}
+          className="task"
+          onTouchStart={touch}
+          onTouchEnd={endTouch}
+          onTouchMove={touchMove}
+          style={{ left: left + "px" }}
         >
-          <form
-            action=""
-            method="post"
+          <div
+            className="task__checked checked"
+            onClick={check}
           >
-            <input
-              type="hidden"
-              name="id"
-              value="id"
-            />
-          </form>
-          <svg
-            fill="transparent"
-            width="2rem"
-            height="2rem"
+            <form
+              action=""
+              method="post"
+            >
+              <input
+                type="hidden"
+                name="id"
+                value="id"
+              />
+            </form>
+            <svg
+              fill="transparent"
+              width="2rem"
+              height="2rem"
+            >
+              <circle
+                cx="50%"
+                cy="50%"
+                r="40%"
+                stroke="black"
+                strokeWidth="7"
+                strokeDasharray="251% 251%"
+              />
+              <circle
+                cx="50%"
+                cy="50%"
+                r="40%"
+                stroke="#fff"
+                strokeWidth="3"
+                strokeDasharray="251% 251%"
+              />
+              {task.status && (
+                <>
+                  <line
+                    x1="28%"
+                    x2="45%"
+                    y1="40%"
+                    y2="70%"
+                    stroke="black"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="45%"
+                    x2="90%"
+                    y1="70%"
+                    y2="10%"
+                    stroke="black"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                  />
+                </>
+              )}
+            </svg>
+          </div>
+          <div className="task__info">
+            <h3 className="task__title" onClick={() => {modifyTask(task)}}>{task.name.substring(0, 15)}</h3>
+            <p className="task__text">{task.details && task.details.substring(0, 20)}</p>
+          </div>
+          <div
+            className="task__time taskExtra {{ $task['type'] }}"
+            onClick={changeValue}
           >
-            <circle
-              cx="50%"
-              cy="50%"
-              r="40%"
-              stroke="black"
-              strokeWidth="7"
-              strokeDasharray="251% 251%"
-            />
-            <circle
-              cx="50%"
-              cy="50%"
-              r="40%"
-              stroke="#fff"
-              strokeWidth="3"
-              strokeDasharray="251% 251%"
-            />
-            {task.status && (
+            {task.type == "repeat" && (
               <>
-                <line
-                  x1="28%"
-                  x2="45%"
-                  y1="40%"
-                  y2="70%"
-                  stroke="black"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="45%"
-                  x2="90%"
-                  y1="70%"
-                  y2="10%"
-                  stroke="black"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                />
+                <h3
+                  className="task__title"
+                  style={{ textTransform: "capitalize" }}
+                >
+                  Count
+                </h3>
+                <p className="task__text">
+                  <span className="task__value value">{value}</span>-<span className="task__limit value-2">{task.count}</span>
+                </p>
               </>
             )}
-          </svg>
+            {task.type == "time" && (
+              <>
+                <h3
+                  className="task__title"
+                  style={{ textTransform: "capitalize" }}
+                >
+                  Remains
+                </h3>
+                <p className="task__text">
+                  <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 86400) / 3600) + "h"}</span>{" "}
+                  <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 3600) / 60) + "m"}</span>{" "}
+                  <span className="task__seconds value-2">{value % 60}</span>s
+                </p>
+              </>
+            )}
+          </div>
+          <div className="close delete delete-desktop">
+            <p
+              onClick={() => {
+                deleteTask(task);
+              }}
+            >
+              Delete
+            </p>
+          </div>
         </div>
-        <div className="task__info">
-          <h3 className="task__title">{task.name.substring(0, 15)}</h3>
-          <p className="task__text">{task.details && task.details.substring(0, 20)}</p>
-        </div>
-        <div
-          className="task__time taskExtra {{ $task['type'] }}"
-          onClick={changeValue}
-        >
-          {task.type == "repeat" && (
-            <>
-              <h3
-                className="task__title"
-                style={{ textTransform: "capitalize" }}
-              >
-                Count
-              </h3>
-              <p className="task__text">
-                <span className="task__value value">{value}</span>-<span className="task__limit value-2">{task.count}</span>
-              </p>
-            </>
-          )}
-          {task.type == "time" && (
-            <>
-              <h3
-                className="task__title"
-                style={{ textTransform: "capitalize" }}
-              >
-                Remains
-              </h3>
-              <p className="task__text">
-                <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 86400) / 3600) + "h"}</span>{" "}
-                <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 3600) / 60) + "m"}</span>{" "}
-                <span className="task__seconds value-2">{value % 60}</span>s
-              </p>
-            </>
-          )}
-        </div>
-        <div className="close delete delete-desktop">
+        <div className="task__delete delete">
           <p
             onClick={() => {
               deleteTask(task);
             }}
           >
-            Delete
+            Remove
           </p>
         </div>
-      </div>
-      <div className="task__delete delete">
-        <p
-          onClick={() => {
-            deleteTask(task);
-          }}
-        >
-          Remove
-        </p>
-      </div>
-    </li>
+      </li>
   );
 }

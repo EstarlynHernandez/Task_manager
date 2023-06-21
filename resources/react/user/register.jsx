@@ -25,6 +25,7 @@ export function Register() {
         email: email,
         password: password,
         repeatPassword: repeatPassword,
+        device: localStorage.getItem('device'),
       })
       .then((r) => {
         if (r.data.type == "field") {
@@ -34,6 +35,7 @@ export function Register() {
           setGenericError("An generic error is happen");
         } else {
           localStorage.setItem("token", r.data.token);
+          localStorage.setItem('device', r.data.deviceName),
           setIsAuth(true);
           setPage("home");
         }

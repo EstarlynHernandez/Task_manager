@@ -1,16 +1,16 @@
 import React, { useContext, useState } from "react";
 import { Auth } from "../IndexContex";
 
-export function Create({ setIsOpen, updateTask, setTasksLoading }) {
-  const [name, setName] = useState("");
-  const [details, setDetails] = useState("");
-  const [type, setType] = useState("normal");
-  const [value, setValue] = useState("");
-  const [count, setCount] = useState("");
+export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEditTask }) {
+  const [name, setName] = useState(editTask.edit ? editTask.name : "");
+  const [details, setDetails] = useState(editTask.edit && editTask.details ? editTask.details : "");
+  const [type, setType] = useState(editTask.edit ? editTask.type : "normal");
+  const [value, setValue] = useState(editTask.edit ? editTask.value / 60 : "");
+  const [count, setCount] = useState(editTask.edit ? editTask.count : "");
   const [taskErrors, setTaskErrors] = useState([]);
   const { filterString } = useContext(Auth);
 
-  function postCreate(){
+  function postCreate() {
     setTasksLoading(false);
     setIsOpen(false);
   }
@@ -27,6 +27,10 @@ export function Create({ setIsOpen, updateTask, setTasksLoading }) {
       run: postCreate,
     };
 
+    if(editTask.id){
+      task.id = editTask.id;
+    };
+
     if (name.length < 3) {
       errors["name"] = true;
     }
@@ -34,7 +38,11 @@ export function Create({ setIsOpen, updateTask, setTasksLoading }) {
     if (errors.length < 1) {
       setTasksLoading(true);
       setTaskErrors([]);
-      updateTask("create", task);
+      if (editTask.edit) {
+        updateTask("edit", task);
+      } else {
+        updateTask("create", task);
+      }
     } else {
       setTaskErrors(errors);
     }
@@ -85,6 +93,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading }) {
           onClick={() => {
             setIsOpen(false);
             setTasksLoading(false);
+            setEditTask(false);
           }}
         >
           <p>Close</p>

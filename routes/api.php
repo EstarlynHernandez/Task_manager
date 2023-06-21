@@ -23,10 +23,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 // Tasks
-Route::get('task', [ApiTaskController::class, 'index'])->middleware('auth:sanctum');
+Route::get('task/{device}', [ApiTaskController::class, 'index'])->middleware('auth:sanctum');
 Route::post('task/store', [ApiTaskController::class, 'store'])->middleware('auth:sanctum');
 Route::put('task/check', [ApiTaskController::class, 'check'])->middleware('auth:sanctum');
+Route::put('task/update', [ApiTaskController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('task/delete', [ApiTaskController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('task/value', [ApiTaskController::class, 'setValue'])->middleware('auth:sanctum');
 
 // Tgroups
 Route::get('group', [ApiTgroupController::class, 'index'])->middleware('auth:sanctum');

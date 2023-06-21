@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Task } from "./task";
 import { useTasks } from "../hooks/useTasks";
 import { Create } from "./create";
@@ -9,9 +9,44 @@ export function Tasks() {
   const [tasks, updateTask] = useTasks([]);
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
-  const { isMenuOpen, filterString } = useContext(Auth);
+  const { isMenuOpen, filterString, isAuth } = useContext(Auth);
   const [taskNameError, setTaskNameError] = useState(false);
   const [tasksLoading, setTasksLoading] = useState(false);
+  const [filter, setFilter] = useState({ order: "name", filter: "all" });
+  const [filterTask, setFilterTask] = useState([]);
+  const [openFilters, setOpenFilters] = useState(false);
+  const [editTask, setEditTask] = useState(false);
+
+  useEffect(() => {
+    fill(filter.order);
+  }, [filter, tasks]);
+
+  function fill(fil) {
+    let taskFilter = [...tasks];
+    if (isAuth) {
+      taskFilter.sort((a, b) => {
+        if (b[fil] > a[fil]) {
+          return -1;
+        } else if (b[fil] < a[fil]) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    }
+
+    if (filter.filter) {
+      switch (filter.filter) {
+        case "complete":
+          taskFilter = taskFilter.filter((task) => task.status);
+          break;
+        case "uncomplete":
+          taskFilter = taskFilter.filter((task) => !task.status);
+          break;
+      }
+    }
+    setFilterTask(taskFilter);
+  }
 
   filterString("string", "min:12|max:2|number");
   function newTask(e) {
@@ -32,12 +67,18 @@ export function Tasks() {
   }
 
   function ThisName(e) {
-    if ((e.target.value.length < 1) | (e.target.value.length > 2)) {
+    if (e.target.value.length < 1 || e.target.value.length > 2) {
       setTaskNameError(false);
     } else {
       setTaskNameError(true);
     }
     setName(e.target.value);
+  }
+
+  function modifyTask(oldTask) {
+    oldTask.edit = true;
+    setEditTask(oldTask);
+    setIsOpen(true);
   }
 
   return (
@@ -47,6 +88,8 @@ export function Tasks() {
           setIsOpen={setIsOpen}
           updateTask={updateTask}
           setTasksLoading={setTasksLoading}
+          editTask={editTask}
+          setEditTask={setEditTask}
         />
       )}
       <div
@@ -54,6 +97,58 @@ export function Tasks() {
         className={isMenuOpen ? "mBlur" : "tasks--container"}
       >
         <div className="task__header">
+          <div className="taskFilter">
+            <h3
+              className="form__title"
+              onClick={() => {
+                setOpenFilters(!openFilters);
+              }}
+            >
+              Filter{openFilters ? "▲" : "▼"}
+            </h3>
+            {openFilters && (
+              <div className="form__filters">
+                <fieldset className="form__set">
+                  <label
+                    className="form__title"
+                    htmlFor="order"
+                  >
+                    Order
+                  </label>
+                  <select
+                    title="filter"
+                    onChange={(e) => setFilter({ ...filter, order: e.target.value })}
+                    name="order"
+                    id="filters"
+                    className="form__input"
+                  >
+                    <option value="name">Name</option>
+                    <option value="create_at">Data</option>
+                    <option value="status">Status</option>
+                  </select>
+                </fieldset>
+                <fieldset className="form__set">
+                  <label
+                    className="form__title"
+                    htmlFor="filter"
+                  >
+                    Show
+                  </label>
+                  <select
+                    title="filter"
+                    onChange={(e) => setFilter({ ...filter, filter: e.target.value })}
+                    name="filter"
+                    id="filters"
+                    className="form__input"
+                  >
+                    <option value="All">All</option>
+                    <option value="complete">Complete</option>
+                    <option value="uncomplete">Uncomplete</option>
+                  </select>
+                </fieldset>
+              </div>
+            )}
+          </div>
           <h1 className="tasks__title">Tasks</h1>
           <div
             className="floating__button createTab"
@@ -112,15 +207,16 @@ export function Tasks() {
             </form>
             {taskNameError && <p className="error__text">Task name need 3 or most words</p>}
           </li>
-          {tasks.length > 0 &&
-            tasks.map(
-              (task) =>
-                task && (
+          {filterTask.length > 0 &&
+            filterTask.map(
+              (filterTask) =>
+                filterTask && (
                   <Task
-                    key={task.id}
-                    task={task}
+                    key={filterTask.id}
+                    task={filterTask}
                     updateTask={updateTask}
                     setTasksLoading={setTasksLoading}
+                    modifyTask={modifyTask}
                   />
                 )
             )}
@@ -144,7 +240,10 @@ export function Tasks() {
           </div>
         )}
       </div>
-      <Groups updateTask={updateTask} setTasksLoading={setTasksLoading} />
+      <Groups
+        updateTask={updateTask}
+        setTasksLoading={setTasksLoading}
+      />
     </main>
   );
 }
