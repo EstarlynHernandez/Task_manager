@@ -8,8 +8,10 @@ export function User({ children }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [page, setPage] = useState("index");
 
+  // return functions and variables
   return <Auth.Provider value={{ isAuth, setIsAuth, isMenuOpen, setIsMenuOpen, page, setPage, filterString }}>{children}</Auth.Provider>;
 
+  // filter for dinamic error in a string and number
   function filterString(string, fill) {
     const filters = fill.split("|");
     let errors = [];
@@ -48,6 +50,7 @@ export function User({ children }) {
       }
     });
 
+    // return errors
     if (errors.length > 0) {
       return errors;
     } else {

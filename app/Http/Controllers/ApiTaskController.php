@@ -34,8 +34,8 @@ class ApiTaskController extends Controller
         try {
             //code...x
             $oldToken = Auth::user()->tokens()->where('name', $device)->first();
-            if ($oldToken['name'] == $device) {
-                $oldToken->delete();
+            if ($oldToken['name'] === $device) {
+                $oldToken = Auth::user()->tokens()->where('name', $device)->first()->delete();
                 $token = Auth::user()->createToken($device)->plainTextToken;
                 return response()->json([
                     'tasks' => $this->getTask(),

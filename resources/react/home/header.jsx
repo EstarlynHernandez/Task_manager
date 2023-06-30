@@ -10,6 +10,7 @@ export function Header() {
     setPage('login');
   }
   return (
+    // header
     <header>
       <div className="header">
         <picture
@@ -22,6 +23,7 @@ export function Header() {
             alt="Estyos Task"
           />
         </picture>
+        {/* if is auth */}
         {isAuth ? (
           <>
             <div

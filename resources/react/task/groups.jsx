@@ -9,22 +9,27 @@ export function Groups({ updateTask, setTasksLoading }) {
   const [groups, updateGroup, current] = useGroup([]);
   const [groupNameError, setGroupNameError] = useState(false);
   const [groupLoading, setGroupLoading] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
+  // create a new group
   function create(e) {
     e.preventDefault();
     if (name.length > 2) {
-      setName("");
-      loading("all");
       updateGroup("create", { name: name, run: runSet });
+      loading("all");
+      setName("");
+      setIsEdit(false);
     }
   }
 
+  // set active Group
   function setGroup(e) {
     setGroupLoading(e.target.id);
     setTasksLoading(true);
     updateGroup("check", { id: e.target.id, run: runSet });
   }
 
+  // loggout for mobile
   function logout() {
     localStorage.removeItem("token");
     setIsAuth(false);
@@ -32,6 +37,7 @@ export function Groups({ updateTask, setTasksLoading }) {
     setPage("login");
   }
 
+  // check the new group text is correct
   function newGroup(e) {
     if ((e.target.value.length < 1) | (e.target.value.length > 2)) {
       setGroupNameError(false);
@@ -41,6 +47,7 @@ export function Groups({ updateTask, setTasksLoading }) {
     setName(e.target.value);
   }
 
+  // set loading animation
   function loading(group) {
     if (group) {
       setGroupLoading(group);
@@ -53,6 +60,7 @@ export function Groups({ updateTask, setTasksLoading }) {
     }
   }
 
+  // remove loading animation
   function runSet() {
     updateTask("update");
     loading(false);
@@ -63,6 +71,20 @@ export function Groups({ updateTask, setTasksLoading }) {
       id="menu"
       className={isMenuOpen ? "menu" : "dnone menu"}
     >
+      {/* edit all group name */}
+      {isAuth && (
+        <div className="group__header only__desktop">
+          <p className="task__title">Groups</p>
+          <p
+            className="edit__button"
+            onClick={() => {
+              setIsEdit(!isEdit);
+            }}
+          >
+            {isEdit ? "Cancel" : "Edit"}
+          </p>
+        </div>
+      )}
       <div className="userM">
         <div className="userM__user">
           <a
@@ -111,6 +133,7 @@ export function Groups({ updateTask, setTasksLoading }) {
               </div>
             )}
           </li>
+          {/* show all groups */}
           {isAuth &&
             groups.map((group) => (
               <Group
@@ -121,9 +144,12 @@ export function Groups({ updateTask, setTasksLoading }) {
                 current={current}
                 loading={loading}
                 groupLoading={groupLoading}
+                isEdit={isEdit}
+                setIsEdit={setIsEdit}
               />
             ))}
         </ul>
+        {/* create new group */}
         {isAuth && (
           <form
             onSubmit={create}

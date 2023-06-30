@@ -102,9 +102,18 @@ class ApiTgroupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        try {
+            $tGroup = Tgroup::find($request['id']);
+            if($tGroup->user_id == Auth::user()->id){
+                $tGroup->name = $request['name'];
+                $tGroup->save();
+            }
+            return response()->json(['groups' => $this->getGroup()]);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage(), 'groups' => $this->getGroup()]);
+        }
     }
 
     /**

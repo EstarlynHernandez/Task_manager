@@ -10,7 +10,7 @@ export function useTasks(initialState) {
 
   // get Task
   function getTask() {
-    // online
+    // Auth user
     if (isAuth) {
       Axios.get("/api/task/" + localStorage.getItem("device"), {
         headers: {
@@ -28,7 +28,7 @@ export function useTasks(initialState) {
           setIsAuth(false);
         });
     } else {
-      // Offline
+      // test user
       const localTask = localStorage.getItem("task");
       if (localTask) {
         setTask(JSON.parse(localTask));
@@ -38,7 +38,7 @@ export function useTasks(initialState) {
 
   // check Task
   function Check(item) {
-    // Online
+    // Auth user
     if (isAuth) {
       Axios.put(
         "api/task/check",
@@ -60,7 +60,7 @@ export function useTasks(initialState) {
           console.log(error);
         });
     } else {
-      // Offline
+      // test user
       let items = JSON.parse(localStorage.getItem("task"));
       items.forEach((element) => {
         if (element) {
@@ -76,7 +76,7 @@ export function useTasks(initialState) {
 
   // Delete Task
   function Delete(item) {
-    // online delete
+    // Auth user delete
     if (isAuth) {
       Axios.delete("api/task/delete", {
         headers: {
@@ -96,7 +96,7 @@ export function useTasks(initialState) {
           console.log(error);
         });
     } else {
-      // offline delete
+      // test user delete
       let items = JSON.parse(localStorage.getItem("task"));
       let newItems = [];
       items.forEach((element) => {
@@ -114,7 +114,7 @@ export function useTasks(initialState) {
 
   // Create Task
   function Create(item) {
-    // online
+    // Auth user
     if (isAuth) {
       Axios.post(
         "api/task/store",
@@ -143,7 +143,7 @@ export function useTasks(initialState) {
           console.log(error);
         });
     } else {
-      // offline
+      // test user
       let items = JSON.parse(localStorage.getItem("task"));
       if (items) {
         let condition = true;
@@ -180,7 +180,7 @@ export function useTasks(initialState) {
 
   // set a value for task
   function SetValue(item) {
-    // online
+    // Auth user
     if (isAuth) {
       Axios.post(
         "api/task/value",
@@ -202,8 +202,9 @@ export function useTasks(initialState) {
     }
   }
 
+  // update a Task
   function Edit(item) {
-    // online
+    // Auth user
     if (isAuth) {
       Axios.put(
         "api/task/update",
@@ -225,7 +226,6 @@ export function useTasks(initialState) {
         .then((response) => response.data)
         .then((res) => {
           setTask(res.tasks);
-          console.log(res);
           if (!res.error) {
             item.run(false);
           }
@@ -234,7 +234,7 @@ export function useTasks(initialState) {
           console.log(error);
         });
     } else {
-      // offline
+      // test user
       let items = JSON.parse(localStorage.getItem("task"));
       if (items) {
         let condition = true;
@@ -255,7 +255,6 @@ export function useTasks(initialState) {
           }
           count++;
           if (count > 500) {
-            console.log(items);
             condition = false;
           }
         }

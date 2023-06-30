@@ -14,6 +14,7 @@ export function Register() {
   const [errors, setErrors] = useState([]);
   const [dinamicErrors, setDinamicErrors] = useState([]);
 
+  // create user function
   function submit(e) {
     e.preventDefault();
     setErrors([]);
@@ -45,6 +46,7 @@ export function Register() {
       });
   }
 
+  // set the dinamic errors
   function setValue(set, filter, element) {
     set(element.value);
     let newErrors = errors;
@@ -63,6 +65,7 @@ export function Register() {
         }}
       >
         <h1 className="tasks__title">Register</h1>
+        {/* show an generic from server error */}
         {genericError && <h2 className="error">{genericError}</h2>}
         <fieldset className="form__set">
           <label
@@ -80,6 +83,7 @@ export function Register() {
             value={name}
             onChange={(e) => setValue(setName, "max:32|min:3", e.target)}
           />
+        {/* show an error */}
           {dinamicErrors.name &&
             dinamicErrors.name.map((e) => (
               <p
@@ -107,6 +111,7 @@ export function Register() {
             value={lastname}
             onChange={(e) => setValue(setLastname, "max:32|min:3", e.target)}
           />
+        {/* show an error */}
           {dinamicErrors.lastname &&
             dinamicErrors.lastname.map((e) => (
               <p
@@ -134,6 +139,7 @@ export function Register() {
             name="username"
             onChange={(e) => setValue(setUsername, "max:32|min:3", e.target)}
           />
+        {/* show an error */}
           {dinamicErrors.username &&
             dinamicErrors.username.map((e) => (
               <p
@@ -161,6 +167,7 @@ export function Register() {
             value={email}
             onChange={(e) => setValue(setEmail, "max:32|min:3|email", e.target)}
           />
+        {/* show an error */}
           {dinamicErrors.email &&
             dinamicErrors.email.map((e) => (
               <p
@@ -188,6 +195,7 @@ export function Register() {
             value={password}
             onChange={(e) => setValue(setPassword, "max:32|min:8", e.target)}
           />
+        {/* show an error */}
           {dinamicErrors.password &&
             dinamicErrors.password.map((e) => (
               <p
@@ -215,6 +223,7 @@ export function Register() {
             name="repeatpassword"        
             onChange={(e) => setValue(setRepeatPassword, 'same:' + password, e.target)}
           />
+        {/* show an error */}
           {dinamicErrors.repeatpassword &&
             dinamicErrors.repeatpassword.map((e) => (
               <p

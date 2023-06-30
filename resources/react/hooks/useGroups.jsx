@@ -7,6 +7,7 @@ export function useGroup(initialState) {
   const [current, setCurrent] = useState("");
   const { isAuth } = useContext(Auth);
 
+  // get all group in the first loading page
   useEffect(() => {
     if (isAuth) {
       Axios.get("/api/group", {
@@ -26,6 +27,7 @@ export function useGroup(initialState) {
     }
   }, []);
 
+  // remove one group
   function Delete(item) {
     Axios.delete("api/group/delete", {
       headers: {
@@ -46,6 +48,7 @@ export function useGroup(initialState) {
       });
   }
 
+  // create a new group
   function Create(item) {
     Axios.post(
       "api/group/store",
@@ -70,6 +73,7 @@ export function useGroup(initialState) {
       });
   }
 
+  // set open group
   function Check(item) {
     Axios.put(
       "api/group/check",
@@ -88,6 +92,58 @@ export function useGroup(initialState) {
     });
   }
 
+  // create new group
+  function Create(item) {
+    Axios.post(
+      "api/group/store",
+      {
+        name: item.name,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          Accept: "application/json",
+        },
+      }
+    )
+      .then((response) => response.data)
+      .then((res) => {
+        setGroups(res.groups);
+        setCurrent(res.active);
+        item.run(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  // update a group
+  function Edit(item) {
+    Axios.put(
+      "api/group/edit",
+      {
+        id: item.id,
+        name: item.name,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          Accept: "application/json",
+        },
+      }
+    )
+      .then((response) => response.data)
+      .then((res) => {
+        setGroups(res.groups);
+        setCurrent(res.active);
+        item.run(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  // select the action to do
   function updateGroup(action, item) {
     switch (action) {
       case "create":
@@ -105,10 +161,16 @@ export function useGroup(initialState) {
           Check(item);
         }
         break;
+      case "edit":
+        if (isAuth) {
+          Edit(item);
+        }
+        break;
       default:
         break;
     }
   }
-  // console.log(isAuth);
+  
+  // return the groups, current group and function to update groups
   return [groups, updateGroup, current];
 }

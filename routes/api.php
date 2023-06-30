@@ -35,6 +35,7 @@ Route::get('group', [ApiTgroupController::class, 'index'])->middleware('auth:san
 Route::post('group/store', [ApiTgroupController::class, 'store'])->middleware('auth:sanctum');
 Route::put('group/check', [ApiTgroupController::class, 'check'])->middleware('auth:sanctum');
 Route::delete('group/delete', [ApiTgroupController::class, 'destroy'])->middleware('auth:sanctum');
+Route::put('group/edit', [ApiTgroupController::class, 'update'])->middleware('auth:sanctum');
 
 // user
 Route::post('login', [ApiController::class, 'login']);

@@ -10,10 +10,13 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
   const [taskErrors, setTaskErrors] = useState([]);
   const { filterString } = useContext(Auth);
 
+  // finish the loading animation
   function postCreate() {
     setTasksLoading(false);
     setIsOpen(false);
   }
+
+  // create a task
   function newTask(e) {
     e.preventDefault();
     let errors = [];
@@ -48,6 +51,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
     }
   }
 
+  // check if the text is correct
   function smallText(set, target) {
     let errors = taskErrors;
     if (target.value.length > 0) {
@@ -59,6 +63,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
     setTaskErrors(errors);
   }
 
+  // check if the text is correct
   function longText(set, target) {
     let errors = taskErrors;
     if (target.value.length > 0) {
@@ -70,6 +75,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
     setTaskErrors(errors);
   }
 
+  // check if is a correct number
   function number(set, target) {
     let errors = taskErrors;
     if (target.value.length > 0) {
@@ -84,6 +90,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
     }
     setTaskErrors(errors);
   }
+
   return (
     <section className="create">
       <div className={"create__header"}>
@@ -99,6 +106,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
           <p>Close</p>
         </div>
       </div>
+      {/* task create form */}
       <form
         className="form taskCreate"
         action=""
@@ -178,6 +186,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
           </select>
         </fieldset>
 
+        {/* check the type selected for repeat */}
         {type == "repeat" && (
           <fieldset
             className="form__set form__secret"
@@ -210,6 +219,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
           </fieldset>
         )}
 
+        {/* check the type selected for time */}
         {type == "time" && (
           <fieldset
             className="form__set form__secret"

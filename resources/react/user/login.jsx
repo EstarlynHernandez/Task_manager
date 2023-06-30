@@ -9,9 +9,9 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
 
+  // login function
   function submit(e) {
     e.preventDefault();
-    console.log(password, email)
     axios
       .post("/api/login", {
         password: password,
@@ -37,6 +37,7 @@ export function Login() {
       });
   }
 
+  // set the dinamic errors
   function setValue(set, filter, element) {
     set(element.value);
     let newErrors = errors;

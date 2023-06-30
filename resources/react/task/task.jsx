@@ -9,19 +9,29 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
 
   // move task on mobile for delete
   function touch(e) {
-    setMouseX(e.touches[0].screenX);
+    if (parseInt(e.target.style.left) != 0) {
+      setMouseX(e.touches[0].screenX - parseInt(e.target.style.left));
+    } else {
+      setMouseX(e.touches[0].screenX);
+    }
   }
   function touchMove(e) {
-    if (left > 1) {
-      setNewMouseX(0);
-    } else {
+    if (left > 125) {
+      setNewMouseX(120);
+      setLeft("120px");
+    } else if (left < -125) {
+      setNewMouseX(-120);
+      setLeft("-120px");
+    } else if (left < 125 && left > -125) {
       setNewMouseX(e.touches[0].screenX - mouseX);
       setLeft(newMouseX);
     }
   }
   function endTouch(e) {
-    if (newMouseX < -40) {
+    if (newMouseX < -60) {
       setLeft(-100);
+    } else if (newMouseX > 60) {
+      setLeft(100);
     } else {
       setLeft(0);
     }
@@ -34,7 +44,7 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
     updateTask("value", item);
   }
 
-  // extra functions
+  // save count and time for tasks
   function changeValue() {
     if (!task.status) {
       if (task.type == "repeat") {
@@ -61,6 +71,7 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
     }
   }
 
+  // stop interval when is paused or finished
   useEffect(() => {
     if (value <= 0 && task.type == "time") {
       clearInterval(interval);
@@ -69,6 +80,7 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
     }
   }, [value]);
 
+  // set task on complete or uncomplete
   function check() {
     updateTask("check", task);
     if (task.status) {
@@ -82,6 +94,7 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
     stInterval("interval");
   }
 
+  // remove task
   function deleteTask(task) {
     setTasksLoading(true);
     task.run = setTasksLoading;
@@ -89,133 +102,140 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
   }
 
   return (
-      <li
-        id="id"
-        className={!task.status ? "tasks__list" : "tasks__list task__complete"}
-        key={task.id}
+    <li
+      id="id"
+      className={!task.status ? "tasks__list" : "tasks__list task__complete"}
+      key={task.id}
+    >
+      <div
+        className="task"
+        onTouchStart={touch}
+        onTouchEnd={endTouch}
+        onTouchMove={touchMove}
+        style={{ left: left + "px" }}
       >
         <div
-          className="task"
-          onTouchStart={touch}
-          onTouchEnd={endTouch}
-          onTouchMove={touchMove}
-          style={{ left: left + "px" }}
+          className="task__checked checked"
+          onClick={check}
         >
-          <div
-            className="task__checked checked"
-            onClick={check}
+          <form
+            action=""
+            method="post"
           >
-            <form
-              action=""
-              method="post"
-            >
-              <input
-                type="hidden"
-                name="id"
-                value="id"
-              />
-            </form>
-            <svg
-              fill="transparent"
-              width="2rem"
-              height="2rem"
-            >
-              <circle
-                cx="50%"
-                cy="50%"
-                r="40%"
-                stroke="black"
-                strokeWidth="7"
-                strokeDasharray="251% 251%"
-              />
-              <circle
-                cx="50%"
-                cy="50%"
-                r="40%"
-                stroke="#fff"
-                strokeWidth="3"
-                strokeDasharray="251% 251%"
-              />
-              {task.status && (
-                <>
-                  <line
-                    x1="28%"
-                    x2="45%"
-                    y1="40%"
-                    y2="70%"
-                    stroke="black"
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="45%"
-                    x2="90%"
-                    y1="70%"
-                    y2="10%"
-                    stroke="black"
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                  />
-                </>
-              )}
-            </svg>
-          </div>
-          <div className="task__info">
-            <h3 className="task__title" onClick={() => {modifyTask(task)}}>{task.name.substring(0, 15)}</h3>
-            <p className="task__text">{task.details && task.details.substring(0, 20)}</p>
-          </div>
-          <div
-            className="task__time taskExtra {{ $task['type'] }}"
-            onClick={changeValue}
+            <input
+              type="hidden"
+              name="id"
+              value="id"
+            />
+          </form>
+          <svg
+            fill="transparent"
+            width="2rem"
+            height="2rem"
           >
-            {task.type == "repeat" && (
+            <circle
+              cx="50%"
+              cy="50%"
+              r="40%"
+              stroke="black"
+              strokeWidth="7"
+              strokeDasharray="251% 251%"
+            />
+            <circle
+              cx="50%"
+              cy="50%"
+              r="40%"
+              stroke="#fff"
+              strokeWidth="3"
+              strokeDasharray="251% 251%"
+            />
+            {task.status && (
               <>
-                <h3
-                  className="task__title"
-                  style={{ textTransform: "capitalize" }}
-                >
-                  Count
-                </h3>
-                <p className="task__text">
-                  <span className="task__value value">{value}</span>-<span className="task__limit value-2">{task.count}</span>
-                </p>
+                <line
+                  x1="28%"
+                  x2="45%"
+                  y1="40%"
+                  y2="70%"
+                  stroke="black"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="45%"
+                  x2="90%"
+                  y1="70%"
+                  y2="10%"
+                  stroke="black"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
               </>
             )}
-            {task.type == "time" && (
-              <>
-                <h3
-                  className="task__title"
-                  style={{ textTransform: "capitalize" }}
-                >
-                  Remains
-                </h3>
-                <p className="task__text">
-                  <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 86400) / 3600) + "h"}</span>{" "}
-                  <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 3600) / 60) + "m"}</span>{" "}
-                  <span className="task__seconds value-2">{value % 60}</span>s
-                </p>
-              </>
-            )}
-          </div>
-          <div className="close delete delete-desktop">
-            <p
-              onClick={() => {
-                deleteTask(task);
-              }}
-            >
-              Delete
-            </p>
-          </div>
+          </svg>
         </div>
-        <div className="task__delete delete">
+        <div className="task__info">
+          <h3
+            className="task__title"
+            onClick={() => {
+              modifyTask(task);
+            }}
+          >
+            {task.name.substring(0, 15)}
+          </h3>
+          <p className="task__text">{task.details && task.details.substring(0, 20)}</p>
+        </div>
+        <div
+          className="task__time taskExtra {{ $task['type'] }}"
+          onClick={changeValue}
+        >
+          {task.type == "repeat" && (
+            <>
+              <h3
+                className="task__title"
+                style={{ textTransform: "capitalize" }}
+              >
+                Count
+              </h3>
+              <p className="task__text">
+                <span className="task__value value">{value}</span>-<span className="task__limit value-2">{task.count}</span>
+              </p>
+            </>
+          )}
+          {task.type == "time" && (
+            <>
+              <h3
+                className="task__title"
+                style={{ textTransform: "capitalize" }}
+              >
+                Remains
+              </h3>
+              <p className="task__text">
+                <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 86400) / 3600) + "h"}</span>{" "}
+                <span className="task__minutes value">{parseInt((value % 3600) / 60) > 0 && parseInt((value % 3600) / 60) + "m"}</span>{" "}
+                <span className="task__seconds value-2">{value % 60}</span>s
+              </p>
+            </>
+          )}
+        </div>
+        <div className="close delete delete-desktop">
           <p
             onClick={() => {
               deleteTask(task);
             }}
           >
-            Remove
+            Delete
           </p>
         </div>
-      </li>
+      </div>
+      <div className="task__delete delete">
+        <p
+          onClick={() => {
+            deleteTask(task);
+          }}
+        >
+          Remove
+        </p>
+      </div>
+    </li>
   );
 }

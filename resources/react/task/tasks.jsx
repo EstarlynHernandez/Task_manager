@@ -17,6 +17,7 @@ export function Tasks() {
   const [openFilters, setOpenFilters] = useState(false);
   const [editTask, setEditTask] = useState(false);
 
+  // filter task
   useEffect(() => {
     fill(filter.order);
   }, [filter, tasks]);
@@ -66,6 +67,7 @@ export function Tasks() {
     }
   }
 
+  // check name for new task
   function ThisName(e) {
     if (e.target.value.length < 1 || e.target.value.length > 2) {
       setTaskNameError(false);
@@ -75,6 +77,7 @@ export function Tasks() {
     setName(e.target.value);
   }
 
+  // update task
   function modifyTask(oldTask) {
     oldTask.edit = true;
     setEditTask(oldTask);
@@ -83,6 +86,7 @@ export function Tasks() {
 
   return (
     <main className={"content"}>
+    {/* check create task is set open or close */}
       {isOpen && (
         <Create
           setIsOpen={setIsOpen}
@@ -200,13 +204,15 @@ export function Tasks() {
               />
               <button
                 type="submit"
-                className="task__button--create"
+                className={"task__button--create " + (!name && "only__desktop")}
               >
                 Create
               </button>
             </form>
             {taskNameError && <p className="error__text">Task name need 3 or most words</p>}
           </li>
+
+          {/* show all filter task for this user */}
           {filterTask.length > 0 &&
             filterTask.map(
               (filterTask) =>
@@ -240,6 +246,8 @@ export function Tasks() {
           </div>
         )}
       </div>
+      
+      {/* show all group for this user */}
       <Groups
         updateTask={updateTask}
         setTasksLoading={setTasksLoading}

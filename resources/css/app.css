@@ -117,6 +117,10 @@ img {
 
 .only__desktop {
   display: none;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
 }
 
 @media screen and (min-width: 800px) {
@@ -271,7 +275,7 @@ img {
 }
 
 .listM {
-  margin-top: 2rem;
+  margin-top: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -412,6 +416,10 @@ form .listM__create {
   }
   .only__desktop {
     display: block;
+    height: auto;
+    width: auto;
+    overflow: auto;
+    opacity: 1;
   }
   .menu__title {
     text-align: center;
@@ -454,6 +462,9 @@ form .listM__create {
   position: relative;
   border-radius: 0.8rem;
   animation: 5s TaskDance infinite;
+  width: 100%;
+  min-height: 2.5rem;
+  overflow: hidden;
 }
 
 .task {
@@ -559,6 +570,14 @@ form .listM__create {
 
 .task__input::placeholder {
   color: #0005;
+}
+
+.group__header {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin-top: 0.5rem;
+  align-items: center;
 }
 
 @keyframes TaskDance {
@@ -788,6 +807,37 @@ form .listM__create {
 
 .form__filters {
   display: flex;
+}
+
+.edit__button {
+  background-color: #ee5;
+  color: black;
+  width: fit-content;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.3rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.task__form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  height: min-content;
+}
+
+.task__form .task__input {
+  width: 65%;
+}
+
+.task__form .task__text {
+  width: 15%;
+}
+
+.task__form .task__button--create {
+  height: 2.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.8rem;
 }
 
 @keyframes onOf {
