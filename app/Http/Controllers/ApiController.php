@@ -28,7 +28,7 @@ class ApiController extends Controller
             ]);
 
             if (Auth::attempt($credentials)) {
-                if (isset($request['device'])) {
+                if (isset($request['device']) && strlen($request['device']) > 10) {
                     $deviceName = $request['device'];
                     $tokenDel = Auth::user()->tokens()
                         ->where('name', $request['device'])
@@ -89,7 +89,7 @@ class ApiController extends Controller
             $user->username = $userData['username'];
             $user->email = $userData['email'];
             $user->password = Hash::make($userData['password']);
-            if ($request['device']) {
+            if (isset($request['device']) && strlen($request['device']) > 10) {
                 $deviceName = $request['device'];
             } else {
                 $deviceName = 'Device' . random_int(00001, 99999) . (new DateTime())->format('dmyhms');
