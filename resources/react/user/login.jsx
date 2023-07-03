@@ -28,10 +28,10 @@ export function Login() {
             setGenericError("Your email or password is incorrect");
           }
         } else {
+          console.log(r.data);
           localStorage.setItem("token", r.data.token);
           localStorage.setItem('device', r.data.deviceName);
-          console.log(r.data);
-          setIsAuth(true);
+          setIsAuth(false);
           setPage("home");
         }
       })

@@ -37,7 +37,7 @@ export function Register() {
         } else {
           localStorage.setItem("token", r.data.token);
           localStorage.setItem('device', r.data.deviceName),
-          setIsAuth(true);
+          setIsAuth(false);
           setPage("home");
         }
       })
