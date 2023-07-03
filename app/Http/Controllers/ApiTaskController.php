@@ -51,7 +51,7 @@ class ApiTaskController extends Controller
                 'error' => true
             ]);
         } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()]);
+            return response()->json(['error' => 'Generic']);
         }
     }
 
