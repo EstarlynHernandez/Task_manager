@@ -28,7 +28,7 @@ class ApiController extends Controller
             ]);
 
             if (Auth::attempt($credentials)) {
-                if ($request['device']) {
+                if (isset($request['device'])) {
                     $deviceName = $request['device'];
                     $tokenDel = Auth::user()->tokens()
                         ->where('name', $request['device'])
@@ -51,7 +51,7 @@ class ApiController extends Controller
                     'error' => true,
                     'message' => 'your email or password are wrong',
                     'type' => 'credentials',
-                ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');;
+                ]);
             }
         } catch (\Throwable $th) {
             return response()->json([
