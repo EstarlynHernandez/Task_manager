@@ -51,7 +51,8 @@ class ApiTaskController extends Controller
                 'error' => true
             ]);
         } catch (\Throwable $th) {
-            return response()->json(['error' => 'generic']);
+            return response()->json(['error' => 'Generic']);
+            //throw $th;
         }
     }
 
@@ -72,7 +73,7 @@ class ApiTaskController extends Controller
                 $task->save();
             }
         } catch (\Throwable $th) {
-            return response()->json(['status' => $request->id]);
+            return response()->json(['error' => 'generic']);
         }
 
         return response()->json([
@@ -239,7 +240,7 @@ class ApiTaskController extends Controller
             }
             return response()->json(['errors' => 'permisions', 'tasks' => $this->getTask()]);
         } catch (\Throwable $th) {
-            return response()->json('tasks' => $this->getTask()]);
+            return response()->json(['error' => $th->getMessage(), 'tasks' => $this->getTask()]);
         }
     }
 
