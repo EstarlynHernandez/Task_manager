@@ -18,21 +18,6 @@ class TaskController extends Controller
     {
         $request->session()->put('group', $group);
 
-        if (Auth::user()) {
-            $groups = Tgroup::Where('user_id', Auth::user()->id)->get();
-            if ($group == 0 or !Tgroup::where('id', $group)->exists()) {
-                $request->session()->put('group', 0);
-                $tasks = Task::Where('user_id', Auth::user()->id)->where('tgroup_id', 0)->get();
-            } else {
-                $tasks = Task::Where('user_id', Auth::user()->id)->where('tgroup_id', $group)->get();
-            }
-
-            return view('tasks/index', [
-                'tasks' => $tasks,
-                'groups' => $groups,
-            ]);
-        }
-
         return view('base');
     }
 

@@ -6,15 +6,11 @@
 
 @vite('resources/react/react_app.jsx')
 @section('meta')
-    @if (Auth::user())
-        @vite('resources/js/app.js')
-    @else
-        @vite('resources/js/local.js')
-    @endif
+    @vite('resources/js/app.js')
 @endsection
 
 @section('content')
-<main class="content" id="content">
+    <main class="content" id="content">
         <div>
             <div class="task__header">
                 @if (Auth::user())
