@@ -1,29 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { GlobalData } from "../IndexContex";
 
-export function Group({ group, updateGroup, updateTask, current, loading, groupLoading, isEdit, setIsEdit }) {
+export function Group({ group, updateGroup, updateTask, loading, groupLoading, isEdit, setIsEdit }) {
+  const { currentGroup } = useContext(GlobalData);
   const [mouseX, setMouseX] = useState(0);
   const [newMouseX, setNewMouseX] = useState(0);
   const [left, setLeft] = useState(0);
   const [name, setName] = useState(group.name);
 
+  useEffect(() => {
+    setLeft(0);
+    setNewMouseX(0);
+  }, [currentGroup]);
+
   // movile move for edid and delete
   function touch(e) {
-    setMouseX(e.touches[0].screenX);
+    setMouseX(e.touches[0].screenX - left);
   }
   function touchMove(e) {
-    if (left > 1) {
-      setNewMouseX(0);
-    } else {
-      setNewMouseX(e.touches[0].screenX - mouseX);
-      setLeft(newMouseX);
-    }
+    setNewMouseX(e.touches[0].screenX - mouseX);
+    setLeft(newMouseX);
   }
   function endTouch(e) {
-    if (newMouseX < -30) {
-      setLeft(-80);
+    if (newMouseX < -60) {
+      setLeft(-100);
+    } else if (newMouseX > 60) {
+      setLeft(100);
     } else {
       setLeft(0);
     }
+  }
+
+  // rename group
+  function renameGroup() {
+    console.log("Work In progress");
   }
 
   // remove loading animation
@@ -64,13 +74,13 @@ export function Group({ group, updateGroup, updateTask, current, loading, groupL
     >
       <div className={"group--container " + (groupLoading == group.id && "loading")}>
         <div
-          className={parseInt(current) == group.id ? "listM__item groupItem listM__open" : "listM__item groupItem"}
+          className={parseInt(currentGroup) == group.id ? "listM__item groupItem listM__open" : "listM__item groupItem"}
           style={{ left: left }}
           onTouchStart={touch}
           onTouchEnd={endTouch}
           onTouchMove={touchMove}
         >
-        {/* check grouo status (edit or not) */}
+          {/* check grouo status (edit or not) */}
           {isEdit ? (
             <form onSubmit={(e) => newGroup(e)}>
               <input
@@ -95,11 +105,9 @@ export function Group({ group, updateGroup, updateTask, current, loading, groupL
             {isEdit ? <p onClick={editGroup}>Save</p> : <p onClick={deleteGroup}>Remove</p>}
           </div>
         </div>
-        <div
-          className="task__delete delete"
-          onClick={deleteGroup}
-        >
-          <p>Remove</p>
+        <div className="task__delete task__del-edit delete">
+          <p onClick={renameGroup}>Edit</p>
+          <p onClick={deleteGroup}>Remove</p>
         </div>
       </div>
       {groupLoading == group.id && (

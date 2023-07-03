@@ -1,10 +1,10 @@
 import React, { useState, useContext } from "react";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 import axios from "axios";
 
 export function Login() {
   const [genericError, setGenericError] = useState("");
-  const { setPage, setIsAuth, filterString } = useContext(Auth);
+  const { setPage, setIsAuth, filterString } = useContext(GlobalData);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);

@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\User;
 use App\Models\Tgroup;
+use App\Models\Task;
 
 return new class extends Migration
 {
@@ -24,6 +25,8 @@ return new class extends Migration
             $table->date('date')->nullable();
             $table->integer('count')->nullable();
             $table->integer('value')->nullable();
+            $table->integer('action')->nullable();
+            $table->string('family')->nullable();
             $table->foreignIdFor(User::class);
             $table->timestamps();
         });

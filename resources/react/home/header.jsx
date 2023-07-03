@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 
 export function Header() {
-  const { isAuth, setIsMenuOpen, setIsAuth, setPage } = useContext(Auth);
+  const { isAuth, setIsMenuOpen, setIsAuth, setPage } = useContext(GlobalData);
 
   function logout() {
     localStorage.removeItem("token");

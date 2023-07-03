@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 
 export function Register() {
-  const { setPage, setIsAuth, filterString } = useContext(Auth);
+  const { setPage, setIsAuth, filterString } = useContext(GlobalData);
   const [genericError, setGenericError] = useState("");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");

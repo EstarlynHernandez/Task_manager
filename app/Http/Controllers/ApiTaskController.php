@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\task;
+use App\Models\Task;
+use DateTime;
 use Illuminate\Support\Facades\Auth;
 
 class ApiTaskController extends Controller
@@ -11,16 +12,20 @@ class ApiTaskController extends Controller
     private function getTask()
     {
         switch (Auth::user()->task_group) {
+            case 'task':
+                $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('action', 1)->get();
+                break;
             case 'daily':
-                $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('tgroup_id', null)->get();
+                $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('action', '>', 19)->where('action', '<', 30)->get();
+                break;
+            case 'date':
+                $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('action', 3)->get();
                 break;
             default:
-                try {
-                    //code...
+                if (is_numeric(Auth::user()->task_group)) {
                     $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('tgroup_id', Auth::user()->task_group)->get();
-                } catch (\Throwable $th) {
-                    $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('tgroup_id', null)->get();
-                    //throw $th;
+                } else {
+                    $tasks = Task::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->where('action', 1)->get();
                 }
                 break;
         }
@@ -46,8 +51,7 @@ class ApiTaskController extends Controller
                 'error' => true
             ]);
         } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()]);
-            //throw $th;
+            return response()->json(['error' => 'generic']);
         }
     }
 
@@ -97,6 +101,8 @@ class ApiTaskController extends Controller
                 'type' => ['required', 'max:512', 'regex:/^[\pL]+$/u'],
                 'count' => ['nullable', 'numeric', 'max:9999'],
                 'value' => ['nullable', 'numeric', 'max:1440'],
+                'date' => ['nullable', 'date'],
+                'repeat' => ['nullable', 'numeric'],
             ]);
 
             $task = new Task;
@@ -119,17 +125,40 @@ class ApiTaskController extends Controller
             }
             $task->status = false;
             $task->user_id = Auth::user()->id;
-            if (is_numeric(Auth::user()->task_group)) {
+            if (!is_numeric(Auth::user()->task_group)) {
+                switch (Auth::user()->task_group) {
+                    case "daily":
+                        $task->action = 21;
+                        $task->family = substr($item['name'], 0, 3) . random_int(10000, 99999) . (new DateTime())->format('ymdhms');
+                        $task->date = new \DateTime('now', new \DateTimeZone("UTC"));
+                        if (isset($item['date'])) {
+                            $task->date = new DateTime($item['date']);
+                        }
+                        if (isset($item['repeat'])) {
+                            $task->action = $item['repeat'] + 20;
+                        }
+                        break;
+                    case "date":
+                        $task->action = 3;
+                        $task->date = new \DateTime('now', new \DateTimeZone("UTC"));
+                        if (isset($item['date'])) {
+                            $task->date = new DateTime($item['date']);
+                        }
+                        break;
+                    default:
+                        $task->action = 1;
+                        break;
+                }
+            } else {
                 $task->tgroup_id = Auth::user()->task_group;
             }
 
             $task->save();
 
-            return response()->json(['tasks' => $this->getTask()]);
+            return response()->json(['tasks' => $this->getTask(), 'data' => $request['date']]);
         } catch (\Throwable $th) {
             return response()->json([
                 'tasks' => $this->getTask(),
-                'error' => $th->getMessage(),
             ]);
         }
     }
@@ -190,7 +219,6 @@ class ApiTaskController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'tasks' => $this->getTask(),
-                'error' => $th->getMessage(),
             ]);
         }
     }
@@ -211,7 +239,7 @@ class ApiTaskController extends Controller
             }
             return response()->json(['errors' => 'permisions', 'tasks' => $this->getTask()]);
         } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage(), 'tasks' => $this->getTask()]);
+            return response()->json('tasks' => $this->getTask()]);
         }
     }
 

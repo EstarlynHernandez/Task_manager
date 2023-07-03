@@ -1,12 +1,12 @@
-import { Auth } from "../IndexContex";
 import React, { useState, useContext, useEffect } from "react";
+import { GlobalData } from "../IndexContex";
 import { useGroup } from "../hooks/useGroups";
 import { Group } from "./group";
 
 export function Groups({ updateTask, setTasksLoading }) {
-  const { isMenuOpen, setIsMenuOpen, setIsAuth, isAuth } = useContext(Auth);
+  const { isMenuOpen, setIsMenuOpen, setIsAuth, isAuth, currentGroup } = useContext(GlobalData);
   const [name, setName] = useState("");
-  const [groups, updateGroup, current] = useGroup([]);
+  const [groups, updateGroup] = useGroup([]);
   const [groupNameError, setGroupNameError] = useState(false);
   const [groupLoading, setGroupLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -105,16 +105,16 @@ export function Groups({ updateTask, setTasksLoading }) {
       </div>
       <div className={"userG"}>
         <ul className={"listM " + (groupLoading == "all" ? "loading" : "")}>
-          <li className={current == "daily" ? "listM__item listM__open " : "listM__item "}>
+          <li className={currentGroup == "task" ? "listM__item listM__open " : "listM__item "}>
             <p
-              id="daily"
+              id="task"
               onClick={setGroup}
-              className={"listM__link " + (groupLoading == "daily" && "loading")}
+              className={"listM__link " + (groupLoading == "task" && "loading")}
               href="/"
             >
               {isAuth ? "Task" : "Local Task"}
             </p>
-            {groupLoading == "daily" && (
+            {groupLoading == "task" && (
               <div className="groupLoading--icon">
                 <svg
                   fill="transparent"
@@ -133,6 +133,67 @@ export function Groups({ updateTask, setTasksLoading }) {
               </div>
             )}
           </li>
+          {isAuth && (
+            <li className={currentGroup == "daily" ? "listM__item listM__open " : "listM__item "}>
+              <p
+                id="daily"
+                onClick={setGroup}
+                className={"listM__link " + (groupLoading == "daily" && "loading")}
+                href="/"
+              >
+                Daily Task
+              </p>
+              {groupLoading == "daily" && (
+                <div className="groupLoading--icon">
+                  <svg
+                    fill="transparent"
+                    viewBox="0 0 100 100"
+                  >
+                    <circle
+                      cx={50}
+                      cy={50}
+                      r={40}
+                      stroke="white"
+                      strokeLinecap="round"
+                      strokeDasharray="140 251"
+                      strokeWidth="1rem"
+                    />
+                  </svg>
+                </div>
+              )}
+            </li>
+          )}
+
+          {isAuth && (
+            <li className={currentGroup == "date" ? "listM__item listM__open " : "listM__item "}>
+              <p
+                id="date"
+                onClick={setGroup}
+                className={"listM__link " + (groupLoading == "date" && "loading")}
+                href="/"
+              >
+                Task by Date
+              </p>
+              {groupLoading == "date" && (
+                <div className="groupLoading--icon">
+                  <svg
+                    fill="transparent"
+                    viewBox="0 0 100 100"
+                  >
+                    <circle
+                      cx={50}
+                      cy={50}
+                      r={40}
+                      stroke="white"
+                      strokeLinecap="round"
+                      strokeDasharray="140 251"
+                      strokeWidth="1rem"
+                    />
+                  </svg>
+                </div>
+              )}
+            </li>
+          )}
           {/* show all groups */}
           {isAuth &&
             groups.map((group) => (
@@ -141,7 +202,6 @@ export function Groups({ updateTask, setTasksLoading }) {
                 group={group}
                 updateTask={updateTask}
                 updateGroup={updateGroup}
-                current={current}
                 loading={loading}
                 groupLoading={groupLoading}
                 isEdit={isEdit}

@@ -7,6 +7,7 @@ use App\Models\User;
 use DateTime;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ApiController extends Controller
 {
@@ -54,7 +55,6 @@ class ApiController extends Controller
             }
         } catch (\Throwable $th) {
             return response()->json([
-                'error' => $th->getMessage(),
                 'type' => 'field'
             ]);
         }
@@ -88,7 +88,7 @@ class ApiController extends Controller
             $user->lastname = $userData['lastname'];
             $user->username = $userData['username'];
             $user->email = $userData['email'];
-            $user->password = $userData['password'];
+            $user->password = Hash::make($userData['password']);
             if ($request['device']) {
                 $deviceName = $request['device'];
             } else {
@@ -104,7 +104,7 @@ class ApiController extends Controller
             return response()->json(['error' => true, 'type' => 'field', 'errors' => $e->errors()]);
         } catch (\Throwable $th) {
             //throw $th;
-            return response()->json(['error' => $th, 'type' => 'generic']);
+            return response()->json(['type' => 'generic']);
         }
     }
 

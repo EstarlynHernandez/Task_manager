@@ -1,10 +1,10 @@
 import Axios from "axios";
 import { useState, useEffect, useContext } from "react";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 
 export function useTasks(initialState) {
   const [tasks, setTask] = useState(initialState);
-  const { isAuth, setIsAuth } = useContext(Auth);
+  const { isAuth, setIsAuth, currentGroup } = useContext(GlobalData);
 
   useEffect(getTask, []);
 
@@ -124,6 +124,8 @@ export function useTasks(initialState) {
           type: item.type,
           count: item.count,
           value: item.value,
+          date: item.date,
+          repeat: item.repeat,
         },
         {
           headers: {

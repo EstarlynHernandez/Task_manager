@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Tgroup;
 use App\Models\User;
-use App\Models\task;
+use App\Models\Task;
 
 class ApiTgroupController extends Controller
 {
@@ -63,15 +63,25 @@ class ApiTgroupController extends Controller
             //throw $th;
             $user = User::find(Auth::user()->id);
             switch ($request['id']) {
-                case 'daily':
-                    $user->task_group = 'daily';
+                case 'task':
+                    $user->task_group = 'task';
                     break;
 
                 default:
                     if (Tgroup::where('id', $request['id'])->exists()) {
                         $user->task_group = $request['id'];
                     } else {
-                        $user->task_group = 'daily';
+                        switch ($request['id']) {
+                            case 'daily':
+                                $user->task_group = 'daily';
+                                break;
+                            case 'date':
+                                $user->task_group = 'date';
+                                break;
+                            default:
+                                $user->task_group = 'task';
+                                break;
+                        }
                     }
 
                     break;
@@ -79,7 +89,7 @@ class ApiTgroupController extends Controller
             $user->save();
             return response()->json(['active' => $user->task_group]);
         } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()]);
+            return response()->json(['error' => 'generic']);
         }
     }
 
@@ -106,7 +116,7 @@ class ApiTgroupController extends Controller
     {
         try {
             $tGroup = Tgroup::find($request['id']);
-            if($tGroup->user_id == Auth::user()->id){
+            if ($tGroup->user_id == Auth::user()->id) {
                 $tGroup->name = $request['name'];
                 $tGroup->save();
             }

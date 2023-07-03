@@ -1,11 +1,11 @@
 import Axios from "axios";
 import { useState, useEffect, useContext } from "react";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 
 export function useGroup(initialState) {
   const [groups, setGroups] = useState(initialState);
   const [current, setCurrent] = useState("");
-  const { isAuth } = useContext(Auth);
+  const { isAuth, setCurrentGroup } = useContext(GlobalData);
 
   // get all group in the first loading page
   useEffect(() => {
@@ -19,7 +19,7 @@ export function useGroup(initialState) {
         .then((r) => {
           (r) => r.json;
           setGroups(r.data.groups);
-          setCurrent(r.data.active);
+          setCurrentGroup(r.data.active);
         })
         .catch((r) => {
           console.log("error");
@@ -88,7 +88,7 @@ export function useGroup(initialState) {
       }
     ).then((r) => {
       item.run(false);
-      setCurrent(r.data.active);
+      setCurrentGroup(r.data.active);
     });
   }
 
@@ -170,7 +170,7 @@ export function useGroup(initialState) {
         break;
     }
   }
-  
+
   // return the groups, current group and function to update groups
   return [groups, updateGroup, current];
 }

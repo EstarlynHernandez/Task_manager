@@ -1,15 +1,19 @@
 import React, { useContext, useState } from "react";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 
 export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEditTask }) {
+  const newDate = new Date();
+  const [date, setDate] = useState(editTask.edit ? editTask.date : `${newDate.getUTCFullYear()}-0${newDate.getUTCMonth() + 1}-0${newDate.getUTCDate()}`);
   const [name, setName] = useState(editTask.edit ? editTask.name : "");
   const [details, setDetails] = useState(editTask.edit && editTask.details ? editTask.details : "");
   const [type, setType] = useState(editTask.edit ? editTask.type : "normal");
-  const [value, setValue] = useState(editTask.edit ? editTask.value / 60 : "");
+  const [value, setValue] = useState(editTask.edit ? editTask.count / 60 : "");
   const [count, setCount] = useState(editTask.edit ? editTask.count : "");
+  const [repeat, setRepeat] = useState(1);
   const [taskErrors, setTaskErrors] = useState([]);
-  const { filterString } = useContext(Auth);
+  const { filterString, currentGroup } = useContext(GlobalData);
 
+  var dateForm = currentGroup == "date" || currentGroup == "daily";
   // finish the loading animation
   function postCreate() {
     setTasksLoading(false);
@@ -27,12 +31,14 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
       type: type,
       value: value,
       count: count,
+      date: date,
+      repeat: repeat,
       run: postCreate,
     };
 
-    if(editTask.id){
+    if (editTask.id) {
       task.id = editTask.id;
-    };
+    }
 
     if (name.length < 3) {
       errors["name"] = true;
@@ -113,6 +119,35 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
         method="post"
         onSubmit={newTask}
       >
+        {dateForm && (
+          <fieldset className="form__set">
+            <label
+              className="form__title"
+              htmlFor="date"
+            >
+              Date
+            </label>
+            <input
+              required
+              className={"form__input " + (taskErrors.date && "error__field")}
+              id="date"
+              type="date"
+              name="date"
+              value={date}
+              onChange={(e) => smallText(setDate, e.target)}
+              placeholder="Date"
+            />
+            {taskErrors.date &&
+              taskErrors.date.map((e) => (
+                <p
+                  className="error__text"
+                  key={e}
+                >
+                  {e}
+                </p>
+              ))}
+          </fieldset>
+        )}
         <fieldset className="form__set">
           <label
             className="form__title"
@@ -252,11 +287,38 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
           </fieldset>
         )}
 
+        {currentGroup == "daily" && (
+          <fieldset className="form__set">
+            <label
+              htmlFor="repeat"
+              className="form__title"
+            >
+              Repeat
+            </label>
+            <select
+              name="repeat"
+              className="form__input"
+              id="repeat"
+              value={repeat}
+              onChange={(e) => setRepeat(e.target.value)}
+            >
+              <option value="1">Daily</option>
+              <option value="2">2 Day</option>
+              <option value="4">4 Day</option>
+              <option value="5">5 Day</option>
+              <option value="6">6 Day</option>
+              <option value="7">Weekly</option>
+              <option value="8">Biweekly</option>
+              <option value="9">Monthly</option>
+            </select>
+          </fieldset>
+        )}
+
         <button
           className="form__button"
           type="submit"
         >
-          Create
+          {editTask.edit ? "Update" : "Create"}
         </button>
       </form>
     </section>

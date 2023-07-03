@@ -260,6 +260,7 @@ img {
 .listM__item--container {
   width: 16rem;
   position: relative;
+  overflow: hidden;
 }
 
 .listM__item {
@@ -533,6 +534,13 @@ form .listM__create {
   align-items: center;
 }
 
+.task__del-edit {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  background: linear-gradient(90deg, orange 40%, red 60% 100%);
+}
+
 .task__delete p {
   color: white;
   font-size: 1.4rem;
@@ -578,6 +586,12 @@ form .listM__create {
   width: 90%;
   margin-top: 0.5rem;
   align-items: center;
+}
+
+.task__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes TaskDance {
@@ -964,14 +978,17 @@ form .listM__create {
   opacity: 0;
   transform: scale(0.9);
 }
+
 .alert-enter-active {
   opacity: 1;
   transform: translateX(0);
   transition: opacity 300ms, transform 300ms;
 }
+
 .alert-exit {
   opacity: 1;
 }
+
 .alert-exit-active {
   opacity: 0;
   transform: scale(0.9);

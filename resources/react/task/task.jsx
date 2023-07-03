@@ -6,6 +6,14 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
   const [left, setLeft] = useState(0);
   const [value, setValue] = useState(task.value);
   const [interval, stInterval] = useState("interval");
+  const [isMobile, setIsMobile] = useState(checkIsMob());
+
+  function checkIsMob() {
+    if (window.screen.width < 800) {
+      return true;
+    }
+    return false;
+  }
 
   // move task on mobile for delete
   function touch(e) {
@@ -16,17 +24,10 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
     }
   }
   function touchMove(e) {
-    if (left > 125) {
-      setNewMouseX(120);
-      setLeft("120px");
-    } else if (left < -125) {
-      setNewMouseX(-120);
-      setLeft("-120px");
-    } else if (left < 125 && left > -125) {
-      setNewMouseX(e.touches[0].screenX - mouseX);
-      setLeft(newMouseX);
-    }
+    setNewMouseX(e.touches[0].screenX - mouseX);
+    setLeft(newMouseX);
   }
+
   function endTouch(e) {
     if (newMouseX < -60) {
       setLeft(-100);
@@ -177,7 +178,9 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
           <h3
             className="task__title"
             onClick={() => {
-              modifyTask(task);
+              {
+                !isMobile && modifyTask(task);
+              }
             }}
           >
             {task.name.substring(0, 15)}
@@ -227,15 +230,24 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
           </p>
         </div>
       </div>
-      <div className="task__delete delete">
-        <p
-          onClick={() => {
-            deleteTask(task);
-          }}
-        >
-          Remove
-        </p>
-      </div>
+      {isMobile && (
+        <div className="task__delete task__del-edit delete">
+          <p
+            onClick={() => {
+              modifyTask(task);
+            }}
+          >
+            Edit
+          </p>
+          <p
+            onClick={() => {
+              deleteTask(task);
+            }}
+          >
+            Remove
+          </p>
+        </div>
+      )}
     </li>
   );
 }

@@ -3,16 +3,22 @@ import { Task } from "./task";
 import { useTasks } from "../hooks/useTasks";
 import { Create } from "./create";
 import { Groups } from "./groups";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 
 export function Tasks() {
+  const newDate = new Date();
   const [tasks, updateTask] = useTasks([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [date, setDate] = useState(`${newDate.getUTCFullYear()}-0${newDate.getUTCMonth() + 1}-0${newDate.getUTCDate()}`);
   const [name, setName] = useState("");
-  const { isMenuOpen, filterString, isAuth } = useContext(Auth);
+  const { isMenuOpen, filterString, isAuth, currentGroup } = useContext(GlobalData);
   const [taskNameError, setTaskNameError] = useState(false);
   const [tasksLoading, setTasksLoading] = useState(false);
-  const [filter, setFilter] = useState({ order: "name", filter: "all" });
+  const [filter, setFilter] = useState({
+    order: "name",
+    filter: "all",
+    date: `${newDate.getUTCFullYear()}-0${newDate.getUTCMonth() + 1}-0${newDate.getUTCDate()}`,
+  });
   const [filterTask, setFilterTask] = useState([]);
   const [openFilters, setOpenFilters] = useState(false);
   const [editTask, setEditTask] = useState(false);
@@ -20,7 +26,7 @@ export function Tasks() {
   // filter task
   useEffect(() => {
     fill(filter.order);
-  }, [filter, tasks]);
+  }, [filter, tasks, filter.date]);
 
   function fill(fil) {
     let taskFilter = [...tasks];
@@ -34,6 +40,10 @@ export function Tasks() {
           return 0;
         }
       });
+    }
+
+    if (currentGroup == "date" || currentGroup == 'daily') {
+      taskFilter = taskFilter.filter((a) => a.date == filter.date);
     }
 
     if (filter.filter) {
@@ -86,7 +96,7 @@ export function Tasks() {
 
   return (
     <main className={"content"}>
-    {/* check create task is set open or close */}
+      {/* check create task is set open or close */}
       {isOpen && (
         <Create
           setIsOpen={setIsOpen}
@@ -149,6 +159,22 @@ export function Tasks() {
                     <option value="complete">Complete</option>
                     <option value="uncomplete">Uncomplete</option>
                   </select>
+                </fieldset>
+                <fieldset className="form__set">
+                  <label
+                    className="form__title"
+                    htmlFor="date"
+                  >
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    name="date"
+                    className="form__input"
+                    id="date"
+                    value={filter.date}
+                    onChange={(e) => setFilter({ ...filter, date: e.target.value })}
+                  />
                 </fieldset>
               </div>
             )}
@@ -246,7 +272,7 @@ export function Tasks() {
           </div>
         )}
       </div>
-      
+
       {/* show all group for this user */}
       <Groups
         updateTask={updateTask}
