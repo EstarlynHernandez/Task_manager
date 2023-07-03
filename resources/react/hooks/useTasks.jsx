@@ -21,8 +21,6 @@ export function useTasks(initialState) {
         .then((r) => {
           (r) => r.json;
           setTask(r.data.tasks);
-          console.log('task');
-          console.log(r.data);
           localStorage.setItem("token", r.data.token);
         })
         .catch((r) => {
