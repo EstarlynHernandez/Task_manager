@@ -11,6 +11,7 @@ export function Login() {
 
   // login function
   function submit(e) {
+    console.log('here');
     e.preventDefault();
     axios
       .post("/api/login", {
@@ -19,6 +20,7 @@ export function Login() {
         device: localStorage.getItem('device'),
       })
       .then((r) => {
+        console.log('here');
         if (r.data.error) {
           if (r.data.type == "field") {
             setGenericError("You need to fill in all the fields");
@@ -27,9 +29,10 @@ export function Login() {
           }
         } else {
           localStorage.setItem("token", r.data.token);
+          localStorage.setItem('device', r.data.deviceName);
+          console.log(r.data);
           setIsAuth(true);
           setPage("home");
-          localStorage.setItem('device', r.data.deviceName);
         }
       })
       .catch((e) => {
