@@ -6,17 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
-class task extends Model
+class Task extends Model
 {
     use HasFactory;
 
-    protected $fillabele = [
+    protected $fillable = [
         'name',
         'details',
         'status',
         'type',
-        'time',
+        'tgroup_id',
+        'date',
         'count',
+        'value',
+        'action',
+        'family',
+        'user_id',
+
     ];
 
     public function times() {

@@ -1,61 +1,106 @@
 import React, { useEffect, useState } from "react";
 
-export function Task({ task, updateTask }) {
+export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
   const [mouseX, setMouseX] = useState(0);
   const [newMouseX, setNewMouseX] = useState(0);
   const [left, setLeft] = useState(0);
   const [value, setValue] = useState(task.value);
   const [interval, stInterval] = useState("interval");
+  const [isMobile, setIsMobile] = useState(checkIsMob());
+
+  function checkIsMob() {
+    if (window.screen.width < 800) {
+      return true;
+    }
+    return false;
+  }
 
   // move task on mobile for delete
   function touch(e) {
-    setMouseX(e.touches[0].screenX);
-  }
-  function touchMove(e) {
-    if (left > 1) {
-      setNewMouseX(0);
+    if (parseInt(e.target.style.left) != 0) {
+      setMouseX(e.touches[0].screenX - parseInt(e.target.style.left));
     } else {
-      setNewMouseX(e.touches[0].screenX - mouseX);
-      setLeft(newMouseX);
+      setMouseX(e.touches[0].screenX);
     }
   }
+  function touchMove(e) {
+    setNewMouseX(e.touches[0].screenX - mouseX);
+    setLeft(newMouseX);
+  }
+
   function endTouch(e) {
-    if (newMouseX < -40) {
+    if (newMouseX < -60) {
       setLeft(-100);
+    } else if (newMouseX > 60) {
+      setLeft(100);
     } else {
       setLeft(0);
     }
   }
 
-  // extra functions
+  function saveValue() {
+    var item = [];
+    item.value = value;
+    item.id = task.id;
+    updateTask("value", item);
+  }
+
+  // save count and time for tasks
   function changeValue() {
-    if (task.type == "repeat") {
-      if (value < task.count) {
-        setValue(value + 1);
-        if (value >= task.count - 1) {
-          updateTask("check", task);
+    if (!task.status) {
+      if (task.type == "repeat") {
+        if (value < task.count) {
+          saveValue();
+          setValue(value + 1);
+          if (value >= task.count - 1) {
+            check();
+          }
         }
-      }
-    } else if (task.type === "time") {
-      if (interval == "interval") {
-        stInterval(
-          setInterval(() => {
-            setValue((val) => val - 1);
-          }, 1000)
-        );
-      } else {
-        clearInterval(interval);
-        stInterval("interval");
+      } else if (task.type === "time") {
+        if (interval == "interval") {
+          stInterval(
+            setInterval(() => {
+              setValue((val) => val - 1);
+            }, 1000)
+          );
+        } else {
+          clearInterval(interval);
+          saveValue();
+          stInterval("interval");
+        }
       }
     }
   }
 
+  // stop interval when is paused or finished
   useEffect(() => {
     if (value <= 0 && task.type == "time") {
       clearInterval(interval);
-      updateTask("check", task);
+      saveValue();
+      check();
     }
   }, [value]);
+
+  // set task on complete or uncomplete
+  function check() {
+    updateTask("check", task);
+    if (task.status) {
+      if (task.type == "repeat") {
+        setValue(0);
+      } else if (task.type == "time") {
+        setValue(task.count);
+      }
+    }
+    clearInterval(interval);
+    stInterval("interval");
+  }
+
+  // remove task
+  function deleteTask(task) {
+    setTasksLoading(true);
+    task.run = setTasksLoading;
+    updateTask("delete", task);
+  }
 
   return (
     <li
@@ -72,9 +117,7 @@ export function Task({ task, updateTask }) {
       >
         <div
           className="task__checked checked"
-          onClick={() => {
-            updateTask("check", task);
-          }}
+          onClick={check}
         >
           <form
             action=""
@@ -132,7 +175,16 @@ export function Task({ task, updateTask }) {
           </svg>
         </div>
         <div className="task__info">
-          <h3 className="task__title">{task.name.substring(0, 15)}</h3>
+          <h3
+            className="task__title"
+            onClick={() => {
+              {
+                !isMobile && modifyTask(task);
+              }
+            }}
+          >
+            {task.name.substring(0, 15)}
+          </h3>
           <p className="task__text">{task.details && task.details.substring(0, 20)}</p>
         </div>
         <div
@@ -171,22 +223,31 @@ export function Task({ task, updateTask }) {
         <div className="close delete delete-desktop">
           <p
             onClick={() => {
-              updateTask("delete", task);
+              deleteTask(task);
             }}
           >
             Delete
           </p>
         </div>
       </div>
-      <div className="task__delete delete">
-        <p
-          onClick={() => {
-            updateTask("delete", task);
-          }}
-        >
-          Remove
-        </p>
-      </div>
+      {isMobile && (
+        <div className="task__delete task__del-edit delete">
+          <p
+            onClick={() => {
+              modifyTask(task);
+            }}
+          >
+            Edit
+          </p>
+          <p
+            onClick={() => {
+              deleteTask(task);
+            }}
+          >
+            Remove
+          </p>
+        </div>
+      )}
     </li>
   );
 }

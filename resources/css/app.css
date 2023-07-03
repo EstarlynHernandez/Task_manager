@@ -53,22 +53,13 @@ img {
   width: 100%;
 }
 
-.error {
-  color: var(--white);
-  background-color: var(--danger);
-  width: fit-content;
-  padding: 1rem 1rem;
-  border-radius: 0.5rem;
-  margin: 0 auto;
-  box-shadow: var(--danger) 0 0 1rem;
-}
-
 /* content */
 
 .content {
   transition: filter 0.5s;
   overflow: hidden;
   height: 100%;
+  padding: 0 1rem;
 }
 
 .content > div {
@@ -76,6 +67,10 @@ img {
 }
 
 .blur {
+  filter: blur(2rem);
+}
+
+.mBlur {
   filter: blur(2rem);
 }
 
@@ -104,12 +99,28 @@ img {
   max-width: 5rem;
 }
 
+.d-group {
+  background-color: red;
+  display: grid;
+  place-content: center;
+  margin: auto;
+  padding: 0.5rem;
+  color: white;
+  font-size: 1.2rem;
+  max-height: 2.4rem;
+  margin-right: 0.2rem;
+}
+
 .delete-desktop {
   display: none;
 }
 
 .only__desktop {
   display: none;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
 }
 
 @media screen and (min-width: 800px) {
@@ -130,7 +141,7 @@ img {
     display: block;
     position: static;
     height: 80%;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
     text-align: center;
   }
   .shadow {
@@ -249,6 +260,7 @@ img {
 .listM__item--container {
   width: 16rem;
   position: relative;
+  overflow: hidden;
 }
 
 .listM__item {
@@ -264,7 +276,7 @@ img {
 }
 
 .listM {
-  margin-top: 2rem;
+  margin-top: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -307,25 +319,24 @@ img {
   max-height: 10%;
 }
 
-form .listM__create{
+form .listM__create {
   border: none;
   height: 3rem;
   margin-bottom: 1rem;
 }
 
-
-.menu__form .listM__button{
-  margin: .5rem auto;
+.menu__form .listM__button {
+  margin: 0.5rem auto;
   height: 3rem;
   width: 10rem;
   padding: 0;
 }
 
-.listM__input{
+.listM__input {
   background-color: #fff7;
   width: 100%;
   height: 100%;
-  padding: .5rem;
+  padding: 0.5rem;
   outline: none;
   border: none;
   font-size: 1rem;
@@ -334,7 +345,7 @@ form .listM__create{
 
 .menu__form {
   width: 16rem;
-  margin: 1rem .5rem;
+  margin: 1rem 0.5rem;
 }
 
 @media screen and (min-width: 800px) {
@@ -356,9 +367,17 @@ form .listM__create{
     display: flex;
     max-height: 4rem;
   }
+
+  .listM--textlimit {
+    max-width: 70%;
+    word-wrap: break-word;
+  }
 }
 
 @media screen and (min-width: 1200px) {
+  .mBlur {
+    filter: blur(0);
+  }
   .menu {
     width: 20rem;
     position: absolute;
@@ -398,6 +417,10 @@ form .listM__create{
   }
   .only__desktop {
     display: block;
+    height: auto;
+    width: auto;
+    overflow: auto;
+    opacity: 1;
   }
   .menu__title {
     text-align: center;
@@ -440,6 +463,9 @@ form .listM__create{
   position: relative;
   border-radius: 0.8rem;
   animation: 5s TaskDance infinite;
+  width: 100%;
+  min-height: 2.5rem;
+  overflow: hidden;
 }
 
 .task {
@@ -508,6 +534,13 @@ form .listM__create{
   align-items: center;
 }
 
+.task__del-edit {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  background: linear-gradient(90deg, orange 40%, red 60% 100%);
+}
+
 .task__delete p {
   color: white;
   font-size: 1.4rem;
@@ -523,17 +556,17 @@ form .listM__create{
   stroke: #93ed07;
 }
 
-.task__button--create{
+.task__button--create {
   background-color: #080;
   border: none;
-  padding: .8rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   color: var(--white);
   border-radius: 1.2rem;
   font-size: 1.5rem;
   outline: none;
 }
 
-.task__input{
+.task__input {
   height: 2rem;
   width: 50%;
   padding: 1.5rem;
@@ -543,8 +576,22 @@ form .listM__create{
   outline: none;
 }
 
-.task__input::placeholder{
+.task__input::placeholder {
   color: #0005;
+}
+
+.group__header {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+.task__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes TaskDance {
@@ -766,15 +813,50 @@ form .listM__create{
   display: none;
 }
 
-.form__error{
+.form__error {
   border: solid 1px #f002;
-  box-shadow: .3rem 0rem 2rem #f00e;
+  box-shadow: 0.3rem 0rem 2rem #f00e;
   animation: linear onOf infinite 5s;
 }
 
+.form__filters {
+  display: flex;
+}
+
+.edit__button {
+  background-color: #ee5;
+  color: black;
+  width: fit-content;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.3rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.task__form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  height: min-content;
+}
+
+.task__form .task__input {
+  width: 65%;
+}
+
+.task__form .task__text {
+  width: 15%;
+}
+
+.task__form .task__button--create {
+  height: 2.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.8rem;
+}
+
 @keyframes onOf {
-  50%{
-    box-shadow: .3rem 0 2rem #f007;
+  50% {
+    box-shadow: 0.3rem 0 2rem #f007;
   }
 }
 
@@ -822,4 +904,93 @@ form .listM__create{
     font-size: 2rem;
     cursor: pointer;
   }
+}
+
+/* Errors */
+.error__text {
+  color: red;
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-style: italic;
+  text-align: center;
+}
+
+.error__text::before {
+  content: "‣";
+  margin-right: 0.3rem;
+}
+
+.error {
+  color: var(--white);
+  background-color: var(--danger);
+  width: fit-content;
+  padding: 1rem 1rem;
+  border-radius: 0.5rem;
+  margin: 0 auto;
+  box-shadow: var(--danger) 0 0 1rem;
+}
+
+.error__field {
+  color: red;
+  font-weight: bold;
+}
+
+/* loading */
+.loading {
+  filter: blur(0.5rem);
+  opacity: 0.3;
+}
+
+.loading--icon {
+  display: block;
+  position: absolute;
+  top: calc(20% - 2rem);
+  left: calc(30% - 2rem);
+  width: 4rem;
+  height: 4rem;
+  border-radius: 2rem;
+  animation: round 1s infinite linear;
+}
+
+@keyframes round {
+  0% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.groupLoading--icon {
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  top: calc(50% - 1rem);
+  right: calc(50% - 1rem);
+  z-index: 10;
+  animation: round 1s infinite linear;
+}
+
+.alert-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.alert-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.alert-exit {
+  opacity: 1;
+}
+
+.alert-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 300ms, transform 300ms;
 }

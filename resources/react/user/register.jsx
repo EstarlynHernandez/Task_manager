@@ -1,10 +1,9 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
-import { Auth } from "../IndexContex";
-import { error } from "laravel-mix/src/Log";
+import { GlobalData } from "../IndexContex";
 
 export function Register() {
-  const { setPage, setIsAuth } = useContext(Auth);
+  const { setPage, setIsAuth, filterString } = useContext(GlobalData);
   const [genericError, setGenericError] = useState("");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -13,7 +12,9 @@ export function Register() {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [errors, setErrors] = useState([]);
+  const [dinamicErrors, setDinamicErrors] = useState([]);
 
+  // create user function
   function submit(e) {
     e.preventDefault();
     setErrors([]);
@@ -25,15 +26,17 @@ export function Register() {
         email: email,
         password: password,
         repeatPassword: repeatPassword,
+        device: localStorage.getItem('device'),
       })
       .then((r) => {
         if (r.data.type == "field") {
           setGenericError("An error with the field is happen");
           setErrors(r.data.errors);
-        } else if ((r.data, error)) {
+        } else if (r.data.error) {
           setGenericError("An generic error is happen");
         } else {
           localStorage.setItem("token", r.data.token);
+          localStorage.setItem('device', r.data.deviceName),
           setIsAuth(true);
           setPage("home");
         }
@@ -41,6 +44,14 @@ export function Register() {
       .catch((e) => {
         setGenericError("Generic Error");
       });
+  }
+
+  // set the dinamic errors
+  function setValue(set, filter, element) {
+    set(element.value);
+    let newErrors = errors;
+    newErrors[element.name] = filterString(element.value, filter);
+    setDinamicErrors(newErrors);
   }
 
   return (
@@ -54,6 +65,7 @@ export function Register() {
         }}
       >
         <h1 className="tasks__title">Register</h1>
+        {/* show an generic from server error */}
         {genericError && <h2 className="error">{genericError}</h2>}
         <fieldset className="form__set">
           <label
@@ -65,11 +77,22 @@ export function Register() {
           <input
             id="name"
             type="text"
+            name="name"
             placeholder="Your Name"
             className={errors.name ? "form__input form__error" : "form__input"}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setValue(setName, "max:32|min:3", e.target)}
           />
+        {/* show an error */}
+          {dinamicErrors.name &&
+            dinamicErrors.name.map((e) => (
+              <p
+                className="error__text"
+                key={e}
+              >
+                {e}
+              </p>
+            ))}
         </fieldset>
 
         <fieldset className="form__set">
@@ -82,11 +105,22 @@ export function Register() {
           <input
             id="lastname"
             type="text"
+            name="lastname"
             placeholder="Lastname"
             className={errors.lastname ? "form__input form__error" : "form__input"}
             value={lastname}
-            onChange={(e) => setLastname(e.target.value)}
+            onChange={(e) => setValue(setLastname, "max:32|min:3", e.target)}
           />
+        {/* show an error */}
+          {dinamicErrors.lastname &&
+            dinamicErrors.lastname.map((e) => (
+              <p
+                className="error__text"
+                key={e}
+              >
+                {e}
+              </p>
+            ))}
         </fieldset>
 
         <fieldset className="form__set">
@@ -102,8 +136,19 @@ export function Register() {
             placeholder="UserName"
             className={errors.username ? "form__input form__error" : "form__input"}
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="username"
+            onChange={(e) => setValue(setUsername, "max:32|min:3", e.target)}
           />
+        {/* show an error */}
+          {dinamicErrors.username &&
+            dinamicErrors.username.map((e) => (
+              <p
+                className="error__text"
+                key={e}
+              >
+                {e}
+              </p>
+            ))}
         </fieldset>
 
         <fieldset className="form__set">
@@ -116,11 +161,22 @@ export function Register() {
           <input
             id="email"
             type="email"
+            name="email"
             placeholder="Email"
             className={errors.email ? "form__input form__error" : "form__input"}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setValue(setEmail, "max:32|min:3|email", e.target)}
           />
+        {/* show an error */}
+          {dinamicErrors.email &&
+            dinamicErrors.email.map((e) => (
+              <p
+                className="error__text"
+                key={e}
+              >
+                {e}
+              </p>
+            ))}
         </fieldset>
 
         <fieldset className="form__set">
@@ -134,10 +190,21 @@ export function Register() {
             id="password"
             type="password"
             placeholder="******"
+            name="password"
             className={errors.password ? "form__input form__error" : "form__input"}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setValue(setPassword, "max:32|min:8", e.target)}
           />
+        {/* show an error */}
+          {dinamicErrors.password &&
+            dinamicErrors.password.map((e) => (
+              <p
+                className="error__text"
+                key={e}
+              >
+                {e}
+              </p>
+            ))}
         </fieldset>
 
         <fieldset className="form__set">
@@ -153,8 +220,19 @@ export function Register() {
             placeholder="******"
             className={errors.repeatPassword ? "form__input form__error" : "form__input"}
             value={repeatPassword}
-            onChange={(e) => setRepeatPassword(e.target.value)}
+            name="repeatpassword"        
+            onChange={(e) => setValue(setRepeatPassword, 'same:' + password, e.target)}
           />
+        {/* show an error */}
+          {dinamicErrors.repeatpassword &&
+            dinamicErrors.repeatpassword.map((e) => (
+              <p
+                className="error__text"
+                key={e}
+              >
+                {e}
+              </p>
+            ))}
         </fieldset>
 
         <button

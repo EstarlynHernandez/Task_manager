@@ -1,26 +1,35 @@
-import { Auth } from "../IndexContex";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { GlobalData } from "../IndexContex";
 import { useGroup } from "../hooks/useGroups";
 import { Group } from "./group";
 
-export function Groups({ updateTask }) {
-  const { isMenuOpen, setIsMenuOpen, setIsAuth, isAuth } = useContext(Auth);
+export function Groups({ updateTask, setTasksLoading }) {
+  const { isMenuOpen, setIsMenuOpen, setIsAuth, isAuth, currentGroup } = useContext(GlobalData);
   const [name, setName] = useState("");
-  const [groups, updateGroup, current] = useGroup([]);
+  const [groups, updateGroup] = useGroup([]);
+  const [groupNameError, setGroupNameError] = useState(false);
+  const [groupLoading, setGroupLoading] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
+  // create a new group
   function create(e) {
     e.preventDefault();
-    if (name) {
+    if (name.length > 2) {
+      updateGroup("create", { name: name, run: runSet });
+      loading("all");
       setName("");
-      updateGroup("create", { name: name, run: updateTask });
+      setIsEdit(false);
     }
   }
 
+  // set active Group
   function setGroup(e) {
-    localStorage.setItem("group", e.target.id);
-    updateGroup("check", { id: e.target.id, run: updateTask });
+    setGroupLoading(e.target.id);
+    setTasksLoading(true);
+    updateGroup("check", { id: e.target.id, run: runSet });
   }
 
+  // loggout for mobile
   function logout() {
     localStorage.removeItem("token");
     setIsAuth(false);
@@ -28,11 +37,54 @@ export function Groups({ updateTask }) {
     setPage("login");
   }
 
+  // check the new group text is correct
+  function newGroup(e) {
+    if ((e.target.value.length < 1) | (e.target.value.length > 2)) {
+      setGroupNameError(false);
+    } else {
+      setGroupNameError(true);
+    }
+    setName(e.target.value);
+  }
+
+  // set loading animation
+  function loading(group) {
+    if (group) {
+      setGroupLoading(group);
+      setTasksLoading(true);
+    } else {
+      setTimeout(() => {
+        setGroupLoading(group);
+        setTasksLoading(false);
+      }, 400);
+    }
+  }
+
+  // remove loading animation
+  function runSet() {
+    updateTask("update");
+    loading(false);
+  }
+
   return (
     <section
       id="menu"
       className={isMenuOpen ? "menu" : "dnone menu"}
     >
+      {/* edit all group name */}
+      {isAuth && (
+        <div className="group__header only__desktop">
+          <p className="task__title">Groups</p>
+          <p
+            className="edit__button"
+            onClick={() => {
+              setIsEdit(!isEdit);
+            }}
+          >
+            {isEdit ? "Cancel" : "Edit"}
+          </p>
+        </div>
+      )}
       <div className="userM">
         <div className="userM__user">
           <a
@@ -51,21 +103,98 @@ export function Groups({ updateTask }) {
           <p>Close</p>
         </div>
       </div>
-      <div className="userG">
-        <ul className="listM">
-          <li className={current == "daily" ? "listM__item listM__open" : "listM__item"}>
+      <div className={"userG"}>
+        <ul className={"listM " + (groupLoading == "all" ? "loading" : "")}>
+          <li className={currentGroup == "task" ? "listM__item listM__open " : "listM__item "}>
             <p
-              id="daily"
+              id="task"
               onClick={setGroup}
-              className="listM__link"
+              className={"listM__link " + (groupLoading == "task" && "loading")}
               href="/"
-            >{isAuth ?
-              'Daily Task'
-              :
-              'Local Task'
-            }
+            >
+              {isAuth ? "Task" : "Local Task"}
             </p>
+            {groupLoading == "task" && (
+              <div className="groupLoading--icon">
+                <svg
+                  fill="transparent"
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    cx={50}
+                    cy={50}
+                    r={40}
+                    stroke="white"
+                    strokeLinecap="round"
+                    strokeDasharray="140 251"
+                    strokeWidth="1rem"
+                  />
+                </svg>
+              </div>
+            )}
           </li>
+          {isAuth && (
+            <li className={currentGroup == "daily" ? "listM__item listM__open " : "listM__item "}>
+              <p
+                id="daily"
+                onClick={setGroup}
+                className={"listM__link " + (groupLoading == "daily" && "loading")}
+                href="/"
+              >
+                Daily Task
+              </p>
+              {groupLoading == "daily" && (
+                <div className="groupLoading--icon">
+                  <svg
+                    fill="transparent"
+                    viewBox="0 0 100 100"
+                  >
+                    <circle
+                      cx={50}
+                      cy={50}
+                      r={40}
+                      stroke="white"
+                      strokeLinecap="round"
+                      strokeDasharray="140 251"
+                      strokeWidth="1rem"
+                    />
+                  </svg>
+                </div>
+              )}
+            </li>
+          )}
+
+          {isAuth && (
+            <li className={currentGroup == "date" ? "listM__item listM__open " : "listM__item "}>
+              <p
+                id="date"
+                onClick={setGroup}
+                className={"listM__link " + (groupLoading == "date" && "loading")}
+                href="/"
+              >
+                Task by Date
+              </p>
+              {groupLoading == "date" && (
+                <div className="groupLoading--icon">
+                  <svg
+                    fill="transparent"
+                    viewBox="0 0 100 100"
+                  >
+                    <circle
+                      cx={50}
+                      cy={50}
+                      r={40}
+                      stroke="white"
+                      strokeLinecap="round"
+                      strokeDasharray="140 251"
+                      strokeWidth="1rem"
+                    />
+                  </svg>
+                </div>
+              )}
+            </li>
+          )}
+          {/* show all groups */}
           {isAuth &&
             groups.map((group) => (
               <Group
@@ -73,10 +202,14 @@ export function Groups({ updateTask }) {
                 group={group}
                 updateTask={updateTask}
                 updateGroup={updateGroup}
-                current={current}
+                loading={loading}
+                groupLoading={groupLoading}
+                isEdit={isEdit}
+                setIsEdit={setIsEdit}
               />
             ))}
         </ul>
+        {/* create new group */}
         {isAuth && (
           <form
             onSubmit={create}
@@ -87,17 +220,16 @@ export function Groups({ updateTask }) {
             <fieldset className="listM__item listM__create">
               <input
                 value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
+                onChange={newGroup}
                 placeholder="Add Group"
                 type="text"
                 id="gName"
                 name="gname"
-                className="listM__input"
+                className={"listM__input " + (groupNameError && "error")}
               />
             </fieldset>
-            {name && <button className="form__button listM__button">Add</button>}
+            {groupNameError && <p className="error__text">Group name need 3 or most words</p>}
+            {name.length > 2 && <button className="form__button listM__button">Add</button>}
           </form>
         )}
       </div>

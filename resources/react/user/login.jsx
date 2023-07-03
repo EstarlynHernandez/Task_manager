@@ -1,19 +1,22 @@
 import React, { useState, useContext } from "react";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 import axios from "axios";
 
 export function Login() {
   const [genericError, setGenericError] = useState("");
-  const { setPage, setIsAuth } = useContext(Auth);
+  const { setPage, setIsAuth, filterString } = useContext(GlobalData);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState([]);
 
+  // login function
   function submit(e) {
     e.preventDefault();
     axios
       .post("/api/login", {
         password: password,
         email: email,
+        device: localStorage.getItem('device'),
       })
       .then((r) => {
         if (r.data.error) {
@@ -25,12 +28,21 @@ export function Login() {
         } else {
           localStorage.setItem("token", r.data.token);
           setIsAuth(true);
-          setPage('home');
+          setPage("home");
+          localStorage.setItem('device', r.data.deviceName);
         }
       })
       .catch((e) => {
         setGenericError("Generic Error");
       });
+  }
+
+  // set the dinamic errors
+  function setValue(set, filter, element) {
+    set(element.value);
+    let newErrors = errors;
+    newErrors[element.name] = filterString(element.value, filter);
+    setErrors(newErrors);
   }
 
   return (
@@ -58,8 +70,18 @@ export function Login() {
             placeholder="Email"
             className="form__input"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="email"
+            onChange={(e) => setValue(setEmail, "email|min:5", e.target)}
           />
+          {errors.email &&
+            errors.email.map((e) => (
+              <p
+                className="error__text"
+                key={e}
+              >
+                {e}
+              </p>
+            ))}
         </fieldset>
 
         <fieldset className="form__set">
@@ -75,7 +97,7 @@ export function Login() {
             placeholder="Password"
             className="form__input"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setValue(setPassword, "min:3", e.target)}
           />
         </fieldset>
 

@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import { Auth } from "../IndexContex";
+import { GlobalData } from "../IndexContex";
 
 export function Header() {
-  const { isAuth, setIsMenuOpen, setIsAuth, setPage } = useContext(Auth);
+  const { isAuth, setIsMenuOpen, setIsAuth, setPage } = useContext(GlobalData);
 
   function logout() {
     localStorage.removeItem("token");
@@ -10,6 +10,7 @@ export function Header() {
     setPage('login');
   }
   return (
+    // header
     <header>
       <div className="header">
         <picture
@@ -22,6 +23,7 @@ export function Header() {
             alt="Estyos Task"
           />
         </picture>
+        {/* if is auth */}
         {isAuth ? (
           <>
             <div
