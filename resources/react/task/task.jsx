@@ -202,7 +202,7 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
                 Count
               </h3>
               <p className="task__text">
-                <span className="task__value value">{value}</span>-<span className="task__limit value-2">{task.count}</span>
+                <span className="task__value value">{String(value)}</span>-<span className="task__limit value-2">{String(task.count)}</span>
               </p>
             </>
           )}

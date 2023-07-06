@@ -28,12 +28,14 @@ export function Register() {
   function CreateUser(e) {
     e.preventDefault();
     if (
-      filterString(email, "email|min:3") &&
-      filterString(name, "max:32|min:3") &&
-      filterString(username, "max:32|min:3") &&
-      filterString(lastname, "max:32|min:3") &&
-      filterString(password, "max:32|min:8") &&
-      filterString(repeatPassword, "same:" + password, e.target)
+      !(
+        filterString(email, "email|min:3") &
+        filterString(name, "max:32|min:3") &
+        filterString(username, "max:32|min:3") &
+        filterString(lastname, "max:32|min:3") &
+        filterString(password, "max:32|min:8") &
+        filterString(repeatPassword, "same:" + password, e.target)
+      )
     ) {
       Login({
         email: email,
@@ -45,6 +47,12 @@ export function Register() {
         action: "user/store",
       });
     } else {
+      console.log(filterString(email, "email|min:3"));
+      console.log(filterString(name, "max:32|min:3"));
+      console.log(filterString(username, "max:32|min:3"));
+      console.log(filterString(lastname, "max:32|min:3"));
+      console.log(filterString(password, "max:32|min:8"));
+      console.log(filterString(repeatPassword, "same:" + password, e.target));
       setAuthErrors({ action: "user/store" });
     }
   }
