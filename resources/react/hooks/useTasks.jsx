@@ -4,7 +4,7 @@ import { GlobalData } from "../IndexContex";
 
 export function useTasks(initialState) {
   const [tasks, setTask] = useState(initialState);
-  const { isAuth, setIsAuth, currentGroup } = useContext(GlobalData);
+  const { isAuth } = useContext(GlobalData);
 
   useEffect(getTask, []);
 
@@ -23,9 +23,8 @@ export function useTasks(initialState) {
           setTask(r.data.tasks);
           localStorage.setItem("token", r.data.token);
         })
-        .catch((r) => {
-          localStorage.removeItem("token");
-          setIsAuth(false);
+        .catch(() => {
+          console.log("error");
         });
     } else {
       // test user
@@ -40,37 +39,18 @@ export function useTasks(initialState) {
   function Check(item) {
     // Auth user
     if (isAuth) {
-      Axios.put(
-        "api/task/check",
-        {
-          id: item.id,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-            Accept: "application/json",
-          },
-        }
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          setTask(data.tasks);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      urlRequest(item, "api/task/check", "put");
     } else {
       // test user
       let items = JSON.parse(localStorage.getItem("task"));
-      items.forEach((element) => {
-        if (element) {
-          if (item.id == element.id) {
-            items[element.id].status = !items[element.id].status;
-            localStorage.setItem("task", JSON.stringify(items));
-            setTask(items);
-          }
+      let newTasks = items.filter((t) => {
+        if (t.id == item.id) {
+          t.status = !t.status;
         }
+        return t;
       });
+      localStorage.setItem("task", JSON.stringify(newTasks));
+      setTask(newTasks);
     }
   }
 
@@ -87,9 +67,8 @@ export function useTasks(initialState) {
           id: item.id,
         },
       })
-        .then((response) => response.data)
-        .then((data) => {
-          setTask(data.tasks);
+        .then((res) => {
+          setTask(res.data.tasks);
           item.run(false);
         })
         .catch((error) => {
@@ -98,16 +77,9 @@ export function useTasks(initialState) {
     } else {
       // test user delete
       let items = JSON.parse(localStorage.getItem("task"));
-      let newItems = [];
-      items.forEach((element) => {
-        if (element) {
-          if (!(item.id == element.id)) {
-            newItems[element.id] = element;
-          }
-        }
-      });
-      localStorage.setItem("task", JSON.stringify(newItems));
-      setTask(newItems);
+      let newTasks = items.filter((t) => t.id != item.id);
+      localStorage.setItem("task", JSON.stringify(newTasks));
+      setTask(newTasks);
     }
     item.run(false);
   }
@@ -116,91 +88,54 @@ export function useTasks(initialState) {
   function Create(item) {
     // Auth user
     if (isAuth) {
-      Axios.post(
-        "api/task/store",
-        {
-          name: item.name,
-          details: item.details,
-          type: item.type,
-          count: item.count,
-          value: item.value,
-          date: item.date,
-          repeat: item.repeat,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-            Accept: "application/json",
-          },
-        }
-      )
-        .then((response) => response.data)
-        .then((res) => {
-          setTask(res.tasks);
-          if (!res.error) {
-            item.run(false);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      urlRequest(item, "api/task/store", "post");
     } else {
       // test user
+      let newItem = getLocalTaskType(item);
       let items = JSON.parse(localStorage.getItem("task"));
-      if (items) {
+      if (items?.length > 0) {
         let condition = true;
         let count = 1;
         while (condition) {
-          if (!items[count]) {
-            item.id = count;
-            item.status = false;
-            item.created_at = new Date();
-            if (item.type == "time") {
-              item.value = parseFloat(item.value) * 60;
-            } else if (item.type == "repeat") {
-              item.count = parseInt(item.count);
-              item.value = 0;
-            }
-            items[count] = item;
+          if (items.filter((i) => i?.id == count).length < 1) {
             condition = false;
+            newItem.id = count;
+            items = [...items, newItem];
             localStorage.setItem("task", JSON.stringify(items));
             setTask(items);
           }
           count++;
         }
       } else {
-        item.id = 0;
-        item.status = false;
-        items = [];
-        items[0] = item;
-        localStorage.setItem("task", JSON.stringify(items));
-        setTask(items);
+        newItem.id = 1;
+        localStorage.setItem("task", JSON.stringify([newItem]));
+        setTask([newItem]);
       }
       item.run(false);
     }
+  }
+
+  function getLocalTaskType(item) {
+    let newItem = { name: item.name, details: item.details, status: false, id: item.id, type: item.type, date: item.date, count: 1, value: 0 };
+    switch (newItem.type) {
+      case "repeat":
+        newItem.count = item.count > 0 ? item.count : 1;
+        newItem.value = 0;
+        break;
+      case "time":
+        newItem.count = item.value > 0 ? item.value * 60 : 10;
+        newItem.value = item.value > 0 ? item.value * 60 : 10;
+        break;
+    }
+
+    return newItem;
   }
 
   // set a value for task
   function SetValue(item) {
     // Auth user
     if (isAuth) {
-      Axios.post(
-        "api/task/value",
-        {
-          id: item.id,
-          value: item.value,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-            Accept: "application/json",
-          },
-        }
-      )
-        .then((response) => response.data)
-        .catch((error) => {
-          console.log(error);
-        });
+      urlRequest(item, "api/task/value", "post");
     }
   }
 
@@ -208,68 +143,63 @@ export function useTasks(initialState) {
   function Edit(item) {
     // Auth user
     if (isAuth) {
-      Axios.put(
-        "api/task/update",
-        {
-          name: item.name,
-          details: item.details,
-          type: item.type,
-          count: item.count,
-          value: item.value,
-          id: item.id,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-            Accept: "application/json",
-          },
-        }
-      )
-        .then((response) => response.data)
-        .then((res) => {
-          setTask(res.tasks);
-          if (!res.error) {
-            item.run(false);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      urlRequest(item, "api/task/update", "put");
     } else {
       // test user
       let items = JSON.parse(localStorage.getItem("task"));
       if (items) {
-        let condition = true;
-        let count = 1;
-        while (condition) {
-          if (count == item.id) {
-            item.status = false;
-            if (item.type == "time") {
-              item.value = parseFloat(item.value) * 60;
-            } else if (item.type == "repeat") {
-              item.count = parseInt(item.count);
-              item.value = 0;
+        let newItems = items.map((i) => {
+          if (i.id == item.id) {
+            i.name = item.name;
+            i.details = item.details;
+            i.status = false;
+            i.id = item.id;
+            i.type = item.type;
+            i.date = item.date;
+            if (item.type == "repeat") {
+              i.count = item.count;
+              i.value = 0;
+            } else if (item.type == "time") {
+              i.count = item.value * 60;
+              i.value = item.value * 60;
             }
-            items[count] = item;
-            condition = false;
-            localStorage.setItem("task", JSON.stringify(items));
-            setTask(items);
           }
-          count++;
-          if (count > 500) {
-            condition = false;
-          }
-        }
-      } else {
-        item.id = 0;
-        item.status = false;
-        items = [];
-        items[0] = item;
-        localStorage.setItem("task", JSON.stringify(items));
-        setTask(items);
+          return i;
+        });
+        localStorage.setItem("task", JSON.stringify(newItems));
+        setTask(newItems);
       }
       item.run(false);
     }
+  }
+
+  function urlRequest(item, url, method) {
+    Axios[method](
+      url,
+      {
+        id: item.id,
+        name: item.name,
+        details: item.details,
+        type: item.type,
+        count: item.count,
+        value: item.value,
+        date: item.date,
+        repeat: item.repeat,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          Accept: "application/json",
+        },
+      }
+    )
+      .then((res) => {
+        setTask(res.data.tasks);
+        item.run && item.run(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   // Select an Action for a task
@@ -296,8 +226,6 @@ export function useTasks(initialState) {
         if (isAuth) {
           SetValue(item);
         }
-        break;
-      default:
         break;
     }
   }

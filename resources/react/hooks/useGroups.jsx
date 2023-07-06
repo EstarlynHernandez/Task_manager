@@ -4,7 +4,6 @@ import { GlobalData } from "../IndexContex";
 
 export function useGroup(initialState) {
   const [groups, setGroups] = useState(initialState);
-  const [current, setCurrent] = useState("");
   const { isAuth, setCurrentGroup } = useContext(GlobalData);
 
   // get all group in the first loading page
@@ -16,12 +15,12 @@ export function useGroup(initialState) {
           Accept: "aplication/json",
         },
       })
-        .then((r) => {
-          (r) => r.json;
-          setGroups(r.data.groups);
-          setCurrentGroup(r.data.active);
+        .then((res) => {
+          (res) => res.json;
+          setGroups({ all: res.data.groups, active: res.data.active });
+          setCurrentGroup(res.data.active);
         })
-        .catch((r) => {
+        .catch(() => {
           console.log("error");
         });
     }
@@ -38,89 +37,19 @@ export function useGroup(initialState) {
         id: item.id,
       },
     })
-      .then((response) => response.data)
-      .then((data) => {
-        item.run(false);
-        setGroups(data.groups);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  // create a new group
-  function Create(item) {
-    Axios.post(
-      "api/group/store",
-      {
-        name: item.name,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-          Accept: "application/json",
-        },
-      }
-    )
-      .then((response) => response.data)
       .then((res) => {
-        setGroups(res.groups);
-        setCurrent(res.active);
         item.run(false);
+        setGroups({ all: res.data.groups, active: res.data.active });
+        setCurrentGroup(res.data.active);
       })
       .catch((error) => {
         console.log(error);
       });
   }
 
-  // set open group
-  function Check(item) {
-    Axios.put(
-      "api/group/check",
-      {
-        id: item.id,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-          Accept: "application/json",
-        },
-      }
-    ).then((r) => {
-      item.run(false);
-      setCurrentGroup(r.data.active);
-    });
-  }
-
-  // create new group
-  function Create(item) {
-    Axios.post(
-      "api/group/store",
-      {
-        name: item.name,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-          Accept: "application/json",
-        },
-      }
-    )
-      .then((response) => response.data)
-      .then((res) => {
-        setGroups(res.groups);
-        setCurrent(res.active);
-        item.run(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  // update a group
-  function Edit(item) {
-    Axios.put(
-      "api/group/edit",
+  function UrlRequest(item, url, method) {
+    Axios[method](
+      url,
       {
         id: item.id,
         name: item.name,
@@ -132,10 +61,13 @@ export function useGroup(initialState) {
         },
       }
     )
-      .then((response) => response.data)
       .then((res) => {
-        setGroups(res.groups);
-        setCurrent(res.active);
+        if (res.data.groups) {
+          setGroups({ all: res.data.groups, active: res.data.active });
+        } else {
+          setGroups({ all: groups.all, active: res.data.active });
+        }
+        setCurrentGroup(res.data.active);
         item.run(false);
       })
       .catch((error) => {
@@ -148,7 +80,7 @@ export function useGroup(initialState) {
     switch (action) {
       case "create":
         if (isAuth) {
-          Create(item);
+          UrlRequest(item, "api/group/store", "post");
         }
         break;
       case "delete":
@@ -158,12 +90,12 @@ export function useGroup(initialState) {
         break;
       case "check":
         if (isAuth) {
-          Check(item);
+          UrlRequest(item, "api/group/check", "put");
         }
         break;
       case "edit":
         if (isAuth) {
-          Edit(item);
+          UrlRequest(item, "api/group/edit", "put");
         }
         break;
       default:
@@ -172,5 +104,5 @@ export function useGroup(initialState) {
   }
 
   // return the groups, current group and function to update groups
-  return [groups, updateGroup, current];
+  return [groups, updateGroup];
 }

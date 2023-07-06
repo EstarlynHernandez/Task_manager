@@ -3,14 +3,15 @@ import { GlobalData } from "../IndexContex";
 
 export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEditTask }) {
   const newDate = new Date();
-  const [date, setDate] = useState(editTask.edit ? editTask.date : `${newDate.getUTCFullYear()}-0${newDate.getUTCMonth() + 1}-0${newDate.getUTCDate()}`);
-  const [name, setName] = useState(editTask.edit ? editTask.name : "");
-  const [details, setDetails] = useState(editTask.edit && editTask.details ? editTask.details : "");
-  const [type, setType] = useState(editTask.edit ? editTask.type : "normal");
-  const [value, setValue] = useState(editTask.edit ? editTask.count / 60 : "");
-  const [count, setCount] = useState(editTask.edit ? editTask.count : "");
-  const [repeat, setRepeat] = useState(1);
-  const [taskErrors, setTaskErrors] = useState([]);
+  const [date, setDate] = useState(
+    editTask.edit ? { value: editTask.date } : { value: `${newDate.getUTCFullYear()}-0${newDate.getUTCMonth() + 1}-0${newDate.getUTCDate()}` }
+  );
+  const [name, setName] = useState(editTask.edit ? { value: editTask.name } : { value: "", errors: false });
+  const [details, setDetails] = useState(editTask.details ? { value: editTask.details } : { value: "", errors: false });
+  const [type, setType] = useState(editTask.edit ? { value: editTask.type } : { value: "normal", errors: false });
+  const [value, setValue] = useState(editTask?.type == "time" ? { value: editTask.value / 60 } : { value: "", errors: false });
+  const [count, setCount] = useState(editTask?.type == "repeat" ? { value: editTask.count } : { value: "", errors: false });
+  const [repeat, setRepeat] = useState({ value: 1 });
   const { filterString, currentGroup } = useContext(GlobalData);
 
   var dateForm = currentGroup == "date" || currentGroup == "daily";
@@ -18,83 +19,49 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
   function postCreate() {
     setTasksLoading(false);
     setIsOpen(false);
+    setEditTask(false);
   }
 
   // create a task
   function newTask(e) {
     e.preventDefault();
-    let errors = [];
+    let errors = [name.errors, details.errors, type.errors, value.errors, count.errors];
 
     let task = {
-      name: name,
-      details: details,
-      type: type,
-      value: value,
-      count: count,
-      date: date,
-      repeat: repeat,
+      name: name.value,
+      details: details.value,
+      type: type.value,
+      value: value.value,
+      count: count.value,
+      date: date.value,
+      repeat: repeat.value,
+      id: editTask.id && editTask.id,
       run: postCreate,
     };
 
-    if (editTask.id) {
-      task.id = editTask.id;
-    }
-
-    if (name.length < 3) {
-      errors["name"] = true;
-    }
-
-    if (errors.length < 1) {
+    if (errors.filter((e) => e).length < 1) {
       setTasksLoading(true);
-      setTaskErrors([]);
       if (editTask.edit) {
         updateTask("edit", task);
       } else {
         updateTask("create", task);
       }
-    } else {
-      setTaskErrors(errors);
     }
   }
 
   // check if the text is correct
   function smallText(set, target) {
-    let errors = taskErrors;
-    if (target.value.length > 0) {
-      errors[target.name] = filterString(target.value, "min:3|max:16");
-    } else {
-      errors[target.name] = false;
-    }
-    set(target.value);
-    setTaskErrors(errors);
+    set({ value: target.value, errors: filterString(target.value, "min:3|max:16") });
   }
 
   // check if the text is correct
   function longText(set, target) {
-    let errors = taskErrors;
-    if (target.value.length > 0) {
-      errors[target.name] = filterString(target.value, "min:3|max:255");
-    } else {
-      errors[target.name] = false;
-    }
-    set(target.value);
-    setTaskErrors(errors);
+    set({ value: target.value, errors: filterString(target.value, "min:3|max:255|nullable") });
   }
 
   // check if is a correct number
   function number(set, target) {
-    let errors = taskErrors;
-    if (target.value.length > 0) {
-      errors[target.name] = filterString(target.value, "number");
-    } else {
-      errors[target.name] = false;
-    }
-    try {
-      set(target.value);
-    } catch (error) {
-      error[target.name] = true;
-    }
-    setTaskErrors(errors);
+    set({ value: target.value, errors: filterString(target.value, "number|nullable") });
   }
 
   return (
@@ -104,15 +71,13 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
         <div
           className="close closeTab"
           onClick={() => {
-            setIsOpen(false);
-            setTasksLoading(false);
-            setEditTask(false);
+            postCreate();
           }}
         >
           <p>Close</p>
         </div>
       </div>
-      {/* task create form */}
+
       <form
         className="form taskCreate"
         action=""
@@ -129,16 +94,16 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
             </label>
             <input
               required
-              className={"form__input " + (taskErrors.date && "error__field")}
+              className={"form__input " + (date.errors && "error__field")}
               id="date"
               type="date"
               name="date"
-              value={date}
+              value={date.value}
               onChange={(e) => smallText(setDate, e.target)}
               placeholder="Date"
             />
-            {taskErrors.date &&
-              taskErrors.date.map((e) => (
+            {date.errors &&
+              date.errors.map((e) => (
                 <p
                   className="error__text"
                   key={e}
@@ -157,16 +122,16 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
           </label>
           <input
             required
-            className={"form__input " + (taskErrors.name && "error__field")}
+            className={"form__input " + (name.errors && "error__field")}
             id="name"
             type="text"
             name="name"
-            value={name}
+            value={name.value}
             onChange={(e) => smallText(setName, e.target)}
             placeholder="Task Name"
           />
-          {taskErrors.name &&
-            taskErrors.name.map((e) => (
+          {name.errors &&
+            name.errors.map((e) => (
               <p
                 className="error__text"
                 key={e}
@@ -183,15 +148,15 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
             Details
           </label>
           <textarea
-            className={"form__textarea " + (taskErrors.details && "error__field")}
+            className={"form__textarea " + (details.errors && "error__field")}
             id="details"
             name="details"
-            value={details}
+            value={details.value}
             onChange={(e) => longText(setDetails, e.target)}
             placeholder="Task Details"
           ></textarea>
-          {taskErrors.details &&
-            taskErrors.details.map((e) => (
+          {details.errors &&
+            details.errors.map((e) => (
               <p
                 className="error__text"
                 key={e}
@@ -212,8 +177,8 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
             name="type"
             className="form__input"
             id="type"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
+            value={type.value}
+            onChange={(e) => setType({ value: e.target.value })}
           >
             <option value="normal">Normal</option>
             <option value="repeat">Repeat</option>
@@ -222,7 +187,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
         </fieldset>
 
         {/* check the type selected for repeat */}
-        {type == "repeat" && (
+        {type.value == "repeat" && (
           <fieldset
             className="form__set form__secret"
             id="count"
@@ -238,12 +203,12 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
               type="number"
               name="count"
               id="times"
-              className={"form__input " + (taskErrors.count && "error__field")}
-              value={count}
+              className={"form__input " + (count.count && "error__field")}
+              value={count.value}
               onChange={(e) => number(setCount, e.target)}
             />
-            {taskErrors.count &&
-              taskErrors.count.map((e) => (
+            {count.errors &&
+              count.errors.map((e) => (
                 <p
                   className="error__text"
                   key={e}
@@ -255,7 +220,7 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
         )}
 
         {/* check the type selected for time */}
-        {type == "time" && (
+        {type.value == "time" && (
           <fieldset
             className="form__set form__secret"
             id="time"
@@ -271,12 +236,12 @@ export function Create({ setIsOpen, updateTask, setTasksLoading, editTask, setEd
               placeholder="How Many Minutes"
               name="time"
               id="time"
-              className={"form__input " + (taskErrors.time && "error__field")}
-              value={value}
+              className={"form__input " + (value.errors && "error__field")}
+              value={value.value}
               onChange={(e) => number(setValue, e.target)}
             />
-            {taskErrors.time &&
-              taskErrors.time.map((e) => (
+            {value.errors &&
+              value.errors.map((e) => (
                 <p
                   className="error__text"
                   key={e}

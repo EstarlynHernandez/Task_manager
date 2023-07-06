@@ -4,45 +4,41 @@ import { useTasks } from "../hooks/useTasks";
 import { Create } from "./create";
 import { Groups } from "./groups";
 import { GlobalData } from "../IndexContex";
+import { useGroup } from "../hooks/useGroups";
 
 export function Tasks() {
   const newDate = new Date();
+  const { isMenuOpen, currentGroup } = useContext(GlobalData);
   const [tasks, updateTask] = useTasks([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [date, setDate] = useState(`${newDate.getUTCFullYear()}-0${newDate.getUTCMonth() + 1}-0${newDate.getUTCDate()}`);
   const [name, setName] = useState("");
-  const { isMenuOpen, filterString, isAuth, currentGroup } = useContext(GlobalData);
   const [taskNameError, setTaskNameError] = useState(false);
   const [tasksLoading, setTasksLoading] = useState(false);
+  const [groups, updateGroup] = useGroup({ all: [], active: "" });
+
   const [filter, setFilter] = useState({
     order: "name",
     filter: "all",
     date: `${newDate.getUTCFullYear()}-0${newDate.getUTCMonth() + 1}-0${newDate.getUTCDate()}`,
   });
-  const [filterTask, setFilterTask] = useState([]);
+  const [filterTasks, setFilterTask] = useState([]);
   const [openFilters, setOpenFilters] = useState(false);
   const [editTask, setEditTask] = useState(false);
 
   // filter task
   useEffect(() => {
-    fill(filter.order);
-  }, [filter, tasks, filter.date]);
-
-  function fill(fil) {
     let taskFilter = [...tasks];
-    if (isAuth) {
-      taskFilter.sort((a, b) => {
-        if (b[fil] > a[fil]) {
-          return -1;
-        } else if (b[fil] < a[fil]) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
-    }
+    taskFilter.sort((a, b) => {
+      if (b[filter.order] > a[filter.order]) {
+        return -1;
+      } else if (b[filter.order] < a[filter.order]) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
 
-    if (currentGroup == "date" || currentGroup == 'daily') {
+    if (currentGroup == "date" || currentGroup == "daily") {
       taskFilter = taskFilter.filter((a) => a.date == filter.date);
     }
 
@@ -57,9 +53,8 @@ export function Tasks() {
       }
     }
     setFilterTask(taskFilter);
-  }
+  }, [filter, tasks, filter.date]);
 
-  filterString("string", "min:12|max:2|number");
   function newTask(e) {
     e.preventDefault();
     setTasksLoading(true);
@@ -239,8 +234,8 @@ export function Tasks() {
           </li>
 
           {/* show all filter task for this user */}
-          {filterTask.length > 0 &&
-            filterTask.map(
+          {filterTasks.length > 0 &&
+            filterTasks.map(
               (filterTask) =>
                 filterTask && (
                   <Task
@@ -277,6 +272,8 @@ export function Tasks() {
       <Groups
         updateTask={updateTask}
         setTasksLoading={setTasksLoading}
+        groups={groups}
+        updateGroup={updateGroup}
       />
     </main>
   );
