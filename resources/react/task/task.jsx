@@ -4,9 +4,13 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
   const [mouseX, setMouseX] = useState(0);
   const [newMouseX, setNewMouseX] = useState(0);
   const [left, setLeft] = useState(0);
-  const [value, setValue] = useState(task.value);
-  const [interval, stInterval] = useState("interval");
-  const [isMobile, setIsMobile] = useState(checkIsMob());
+  const [value, setValue] = useState(parseInt(task.value));
+  const [interval, addInterval] = useState("interval");
+  const [isMobile] = useState(checkIsMob());
+
+  useEffect(() => {
+    setValue(parseInt(task.value));
+  }, [task.value]);
 
   function checkIsMob() {
     if (window.screen.width < 800) {
@@ -27,7 +31,6 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
     setNewMouseX(e.touches[0].screenX - mouseX);
     setLeft(newMouseX);
   }
-
   function endTouch(e) {
     if (newMouseX < -60) {
       setLeft(-100);
@@ -38,6 +41,7 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
     }
   }
 
+  // save value for count and time
   function saveValue() {
     var item = [];
     item.value = value;
@@ -57,8 +61,8 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
           }
         }
       } else if (task.type === "time") {
-        if (interval == "interval") {
-          stInterval(
+        if (interval == "interval" && value > 0) {
+          addInterval(
             setInterval(() => {
               setValue((val) => val - 1);
             }, 1000)
@@ -66,7 +70,7 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
         } else {
           clearInterval(interval);
           saveValue();
-          stInterval("interval");
+          addInterval("interval");
         }
       }
     }
@@ -92,7 +96,7 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
       }
     }
     clearInterval(interval);
-    stInterval("interval");
+    addInterval("interval");
   }
 
   // remove task
@@ -174,17 +178,15 @@ export function Task({ task, updateTask, setTasksLoading, modifyTask }) {
             )}
           </svg>
         </div>
-        <div className="task__info">
-          <h3
-            className="task__title"
-            onClick={() => {
-              {
-                !isMobile && modifyTask(task);
-              }
-            }}
-          >
-            {task.name.substring(0, 15)}
-          </h3>
+        <div
+          className="task__info"
+          onClick={() => {
+            {
+              !isMobile && modifyTask(task);
+            }
+          }}
+        >
+          <h3 className="task__title">{task.name.substring(0, 15)}</h3>
           <p className="task__text">{task.details && task.details.substring(0, 20)}</p>
         </div>
         <div

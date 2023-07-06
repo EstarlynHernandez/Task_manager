@@ -1,40 +1,15 @@
 import React, { useState, useContext } from "react";
 import { GlobalData } from "../IndexContex";
-import axios from "axios";
 
 export function Login() {
-  const [genericError, setGenericError] = useState("");
-  const { setPage, setIsAuth, filterString } = useContext(GlobalData);
+  const { setPage, authErrors, filterString, Login, setAuthErrors } = useContext(GlobalData);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
+  let loginErrors;
 
-  // login function
-  function submit(e) {
-    e.preventDefault();
-    axios
-      .post("/api/login", {
-        password: password,
-        email: email,
-        device: localStorage.getItem('device'),
-      })
-      .then((r) => {
-        if (r.data.error) {
-          if (r.data.type == "field") {
-            setGenericError("You need to fill in all the fields");
-          } else {
-            setGenericError("Your email or password is incorrect");
-          }
-        } else {
-          localStorage.setItem("token", r.data.token);
-          localStorage.setItem('device', r.data.deviceName);
-          setIsAuth(false);
-          setPage("home");
-        }
-      })
-      .catch((e) => {
-        setGenericError("Generic Error");
-      });
+  if (authErrors?.action != "user/store") {
+    loginErrors = authErrors;
   }
 
   // set the dinamic errors
@@ -48,15 +23,18 @@ export function Login() {
   return (
     <section>
       <form
-        action="/"
-        method="post"
         className="form"
         onSubmit={(e) => {
-          submit(e);
+          e.preventDefault();
+          if (!filterString(email, "email|min:5") && !filterString(password, "min:3")) {
+            Login({ password: password, email: email, action: "login" });
+          }else{
+            setAuthErrors({error: true, message: "you need to fill all of the field"});
+          }
         }}
       >
         <h1 className="tasks__title">Login</h1>
-        {genericError && <h2 className="error">{genericError}</h2>}
+        {loginErrors && <h2 className="error">{loginErrors.message}</h2>}
         <fieldset className="form__set">
           <label
             htmlFor="email"
@@ -68,7 +46,7 @@ export function Login() {
             type="email"
             id="email"
             placeholder="Email"
-            className="form__input"
+            className={loginErrors ? "form__input form__error" : "form__input"}
             value={email}
             name="email"
             onChange={(e) => setValue(setEmail, "email|min:5", e.target)}
@@ -95,7 +73,7 @@ export function Login() {
             type="password"
             id="password"
             placeholder="Password"
-            className="form__input"
+            className={loginErrors ? "form__input form__error" : "form__input"}
             value={password}
             onChange={(e) => setValue(setPassword, "min:3", e.target)}
           />

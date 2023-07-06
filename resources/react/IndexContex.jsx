@@ -1,4 +1,5 @@
 import React, { useState, createContext } from "react";
+import axios from "axios";
 
 export const GlobalData = createContext();
 
@@ -7,12 +8,72 @@ export function AppContex({ children }) {
   const [isAuth, setIsAuth] = useState(log);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [page, setPage] = useState("index");
-  const [currentGroup, setCurrentGroup] = useState('task');
+  const [currentGroup, setCurrentGroup] = useState("task");
+  const [authErrors, setAuthErrors] = useState('');
 
   // return functions and variables
-  return <GlobalData.Provider value={{ isAuth, setIsAuth, isMenuOpen, setIsMenuOpen, page, setPage, filterString, currentGroup, setCurrentGroup }}>{children}</GlobalData.Provider>;
+  return (
+    <GlobalData.Provider
+      value={{
+        isAuth,
+        setIsAuth,
+        isMenuOpen,
+        setIsMenuOpen,
+        page,
+        setPage,
+        filterString,
+        logout,
+        currentGroup,
+        setCurrentGroup,
+        Login,
+        authErrors,
+        setAuthErrors,
+      }}
+    >
+      {children}
+    </GlobalData.Provider>
+  );
 
   // filter for dinamic error in a string and number
+
+  // logout
+  function logout() {
+    localStorage.removeItem("token");
+    setIsAuth(false);
+    setIsMenuOpen(false);
+    setPage("login");
+  }
+
+  function Login(user) {
+    axios
+      .post("/api/" + user.action, {
+        password: user.password,
+        email: user.email,
+        name: user.name,
+        lastname: user.lastname,
+        username: user.username,
+        repeatPassword: user.repeatPassword,
+        device: localStorage.getItem("device"),
+      })
+      .then((r) => {
+        if (r.data.error) {
+          if (r.data.type == "field") {
+            setAuthErrors({ ...r.data.errors, action: user.action });
+          } else {
+            setAuthErrors({ ...r.data.errors, message: "your email or password are wrong" });
+          }
+        } else {
+          localStorage.setItem("token", r.data.token);
+          localStorage.setItem("device", r.data.deviceName);
+          setIsAuth(true);
+          setAuthErrors('');
+          setPage("home");
+        }
+      })
+      .catch((e) => {
+        setAuthErrors("Generic Errors");
+      });
+  }
 }
 
 function filterString(string, fill) {
@@ -48,6 +109,11 @@ function filterString(string, fill) {
       case "same":
         if (string != filterFill[1]) {
           errors.push("This field is not the same that password");
+        }
+        break;
+      case "nullable":
+        if (string == null || string.length < 1) {
+          errors = false;
         }
         break;
     }

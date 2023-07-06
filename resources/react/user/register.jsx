@@ -1,57 +1,52 @@
 import React, { useContext, useState } from "react";
-import axios from "axios";
 import { GlobalData } from "../IndexContex";
 
 export function Register() {
-  const { setPage, setIsAuth, filterString } = useContext(GlobalData);
-  const [genericError, setGenericError] = useState("");
+  const { setPage, filterString, authErrors, setAuthErrors, Login } = useContext(GlobalData);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-  const [errors, setErrors] = useState([]);
   const [dinamicErrors, setDinamicErrors] = useState([]);
 
-  // create user function
-  function submit(e) {
-    e.preventDefault();
-    setErrors([]);
-    axios
-      .post("/api/user/store", {
-        name: name,
-        lastname: lastname,
-        username: username,
-        email: email,
-        password: password,
-        repeatPassword: repeatPassword,
-        device: localStorage.getItem('device'),
-      })
-      .then((r) => {
-        if (r.data.type == "field") {
-          setGenericError("An error with the field is happen");
-          setErrors(r.data.errors);
-        } else if (r.data.error) {
-          setGenericError("An generic error is happen");
-        } else {
-          localStorage.setItem("token", r.data.token);
-          localStorage.setItem('device', r.data.deviceName),
-          setIsAuth(true);
-          setPage("home");
-        }
-      })
-      .catch((e) => {
-        setGenericError("Generic Error");
-      });
+  var registerErrors = {};
+  if (authErrors?.action == "user/store") {
+    registerErrors = authErrors;
   }
 
   // set the dinamic errors
   function setValue(set, filter, element) {
+    registerErrors[element.name] = false;
     set(element.value);
-    let newErrors = errors;
+    let newErrors = dinamicErrors;
     newErrors[element.name] = filterString(element.value, filter);
     setDinamicErrors(newErrors);
+  }
+
+  function CreateUser(e) {
+    e.preventDefault();
+    if (
+      filterString(email, "email|min:3") &&
+      filterString(name, "max:32|min:3") &&
+      filterString(username, "max:32|min:3") &&
+      filterString(lastname, "max:32|min:3") &&
+      filterString(password, "max:32|min:8") &&
+      filterString(repeatPassword, "same:" + password, e.target)
+    ) {
+      Login({
+        email: email,
+        password: password,
+        name: name,
+        lastname: lastname,
+        username: username,
+        repeatPassword: repeatPassword,
+        action: "user/store",
+      });
+    } else {
+      setAuthErrors({ action: "user/store" });
+    }
   }
 
   return (
@@ -60,13 +55,10 @@ export function Register() {
         action="/"
         method="post"
         className="form"
-        onSubmit={(e) => {
-          submit(e);
-        }}
+        onSubmit={CreateUser}
       >
         <h1 className="tasks__title">Register</h1>
-        {/* show an generic from server error */}
-        {genericError && <h2 className="error">{genericError}</h2>}
+        {registerErrors.action && <h2 className="error">You need to fill all of the fields correctly</h2>}
         <fieldset className="form__set">
           <label
             htmlFor="name"
@@ -79,11 +71,13 @@ export function Register() {
             type="text"
             name="name"
             placeholder="Your Name"
-            className={errors.name ? "form__input form__error" : "form__input"}
+            className={registerErrors.name || dinamicErrors.name ? "form__input form__error" : "form__input"}
             value={name}
-            onChange={(e) => setValue(setName, "max:32|min:3", e.target)}
+            onChange={(e) => {
+              setValue(setName, "max:32|min:3", e.target);
+            }}
           />
-        {/* show an error */}
+          {/* show an error */}
           {dinamicErrors.name &&
             dinamicErrors.name.map((e) => (
               <p
@@ -107,11 +101,11 @@ export function Register() {
             type="text"
             name="lastname"
             placeholder="Lastname"
-            className={errors.lastname ? "form__input form__error" : "form__input"}
+            className={registerErrors.lastname || dinamicErrors.lastname ? "form__input form__error" : "form__input"}
             value={lastname}
             onChange={(e) => setValue(setLastname, "max:32|min:3", e.target)}
           />
-        {/* show an error */}
+          {/* show an error */}
           {dinamicErrors.lastname &&
             dinamicErrors.lastname.map((e) => (
               <p
@@ -134,12 +128,12 @@ export function Register() {
             id="username"
             type="text"
             placeholder="UserName"
-            className={errors.username ? "form__input form__error" : "form__input"}
+            className={registerErrors.username || dinamicErrors.username ? "form__input form__error" : "form__input"}
             value={username}
             name="username"
             onChange={(e) => setValue(setUsername, "max:32|min:3", e.target)}
           />
-        {/* show an error */}
+          {/* show an error */}
           {dinamicErrors.username &&
             dinamicErrors.username.map((e) => (
               <p
@@ -163,11 +157,11 @@ export function Register() {
             type="email"
             name="email"
             placeholder="Email"
-            className={errors.email ? "form__input form__error" : "form__input"}
+            className={registerErrors.email || dinamicErrors.email ? "form__input form__error" : "form__input"}
             value={email}
             onChange={(e) => setValue(setEmail, "max:32|min:3|email", e.target)}
           />
-        {/* show an error */}
+          {/* show an error */}
           {dinamicErrors.email &&
             dinamicErrors.email.map((e) => (
               <p
@@ -191,11 +185,11 @@ export function Register() {
             type="password"
             placeholder="******"
             name="password"
-            className={errors.password ? "form__input form__error" : "form__input"}
+            className={registerErrors.password || dinamicErrors.password ? "form__input form__error" : "form__input"}
             value={password}
             onChange={(e) => setValue(setPassword, "max:32|min:8", e.target)}
           />
-        {/* show an error */}
+          {/* show an error */}
           {dinamicErrors.password &&
             dinamicErrors.password.map((e) => (
               <p
@@ -218,12 +212,12 @@ export function Register() {
             id="repassword"
             type="password"
             placeholder="******"
-            className={errors.repeatPassword ? "form__input form__error" : "form__input"}
+            className={registerErrors.repeatPassword || dinamicErrors.repeatPassword ? "form__input form__error" : "form__input"}
             value={repeatPassword}
-            name="repeatpassword"        
-            onChange={(e) => setValue(setRepeatPassword, 'same:' + password, e.target)}
+            name="repeatpassword"
+            onChange={(e) => setValue(setRepeatPassword, "same:" + password, e.target)}
           />
-        {/* show an error */}
+          {/* show an error */}
           {dinamicErrors.repeatpassword &&
             dinamicErrors.repeatpassword.map((e) => (
               <p

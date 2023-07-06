@@ -1,40 +1,39 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { GlobalData } from "../IndexContex";
-import { useGroup } from "../hooks/useGroups";
 import { Group } from "./group";
 
-export function Groups({ updateTask, setTasksLoading }) {
-  const { isMenuOpen, setIsMenuOpen, setIsAuth, isAuth, currentGroup } = useContext(GlobalData);
+export function Groups({ updateTask, setTasksLoading, groups, updateGroup }) {
+  const { isMenuOpen, setIsMenuOpen, logout, isAuth } = useContext(GlobalData);
   const [name, setName] = useState("");
-  const [groups, updateGroup] = useGroup([]);
   const [groupNameError, setGroupNameError] = useState(false);
   const [groupLoading, setGroupLoading] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
+  const [isGroupEdit, setIsGroupEdit] = useState(false);
+
+  // remove loading animation and refresh task
+  function refreshAll() {
+    updateTask("update");
+    loading(false);
+    setIsGroupEdit(false);
+  }
 
   // create a new group
   function create(e) {
     e.preventDefault();
     if (name.length > 2) {
-      updateGroup("create", { name: name, run: runSet });
+      updateGroup("create", { name: name, run: refreshAll });
       loading("all");
       setName("");
-      setIsEdit(false);
+      setIsGroupEdit(false);
     }
   }
 
   // set active Group
   function setGroup(e) {
-    setGroupLoading(e.target.id);
-    setTasksLoading(true);
-    updateGroup("check", { id: e.target.id, run: runSet });
-  }
-
-  // loggout for mobile
-  function logout() {
-    localStorage.removeItem("token");
-    setIsAuth(false);
-    setIsMenuOpen(false);
-    setPage("login");
+    if (groups.active != e.target.id) {
+      setGroupLoading(e.target.id);
+      setTasksLoading(true);
+      updateGroup("check", { id: e.target.id, run: refreshAll });
+    }
   }
 
   // check the new group text is correct
@@ -60,12 +59,6 @@ export function Groups({ updateTask, setTasksLoading }) {
     }
   }
 
-  // remove loading animation
-  function runSet() {
-    updateTask("update");
-    loading(false);
-  }
-
   return (
     <section
       id="menu"
@@ -78,10 +71,10 @@ export function Groups({ updateTask, setTasksLoading }) {
           <p
             className="edit__button"
             onClick={() => {
-              setIsEdit(!isEdit);
+              setIsGroupEdit(!isGroupEdit);
             }}
           >
-            {isEdit ? "Cancel" : "Edit"}
+            {isGroupEdit ? "Cancel" : "Edit"}
           </p>
         </div>
       )}
@@ -105,7 +98,7 @@ export function Groups({ updateTask, setTasksLoading }) {
       </div>
       <div className={"userG"}>
         <ul className={"listM " + (groupLoading == "all" ? "loading" : "")}>
-          <li className={currentGroup == "task" ? "listM__item listM__open " : "listM__item "}>
+          <li className={groups.active == "task" ? "listM__item listM__open " : "listM__item "}>
             <p
               id="task"
               onClick={setGroup}
@@ -134,81 +127,83 @@ export function Groups({ updateTask, setTasksLoading }) {
             )}
           </li>
           {isAuth && (
-            <li className={currentGroup == "daily" ? "listM__item listM__open " : "listM__item "}>
-              <p
-                id="daily"
-                onClick={setGroup}
-                className={"listM__link " + (groupLoading == "daily" && "loading")}
-                href="/"
-              >
-                Daily Task
-              </p>
-              {groupLoading == "daily" && (
-                <div className="groupLoading--icon">
-                  <svg
-                    fill="transparent"
-                    viewBox="0 0 100 100"
-                  >
-                    <circle
-                      cx={50}
-                      cy={50}
-                      r={40}
-                      stroke="white"
-                      strokeLinecap="round"
-                      strokeDasharray="140 251"
-                      strokeWidth="1rem"
-                    />
-                  </svg>
-                </div>
-              )}
-            </li>
-          )}
+            <>
+              <li className={groups.active == "daily" ? "listM__item listM__open " : "listM__item "}>
+                <p
+                  id="daily"
+                  onClick={setGroup}
+                  className={"listM__link " + (groupLoading == "daily" && "loading")}
+                  href="/"
+                >
+                  Daily Task
+                </p>
+                {groupLoading == "daily" && (
+                  <div className="groupLoading--icon">
+                    <svg
+                      fill="transparent"
+                      viewBox="0 0 100 100"
+                    >
+                      <circle
+                        cx={50}
+                        cy={50}
+                        r={40}
+                        stroke="white"
+                        strokeLinecap="round"
+                        strokeDasharray="140 251"
+                        strokeWidth="1rem"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </li>
 
-          {isAuth && (
-            <li className={currentGroup == "date" ? "listM__item listM__open " : "listM__item "}>
-              <p
-                id="date"
-                onClick={setGroup}
-                className={"listM__link " + (groupLoading == "date" && "loading")}
-                href="/"
-              >
-                Task by Date
-              </p>
-              {groupLoading == "date" && (
-                <div className="groupLoading--icon">
-                  <svg
-                    fill="transparent"
-                    viewBox="0 0 100 100"
-                  >
-                    <circle
-                      cx={50}
-                      cy={50}
-                      r={40}
-                      stroke="white"
-                      strokeLinecap="round"
-                      strokeDasharray="140 251"
-                      strokeWidth="1rem"
-                    />
-                  </svg>
-                </div>
-              )}
-            </li>
+              <li className={groups.active == "date" ? "listM__item listM__open " : "listM__item "}>
+                <p
+                  id="date"
+                  onClick={setGroup}
+                  className={"listM__link " + (groupLoading == "date" && "loading")}
+                  href="/"
+                >
+                  Task by Date
+                </p>
+                {groupLoading == "date" && (
+                  <div className="groupLoading--icon">
+                    <svg
+                      fill="transparent"
+                      viewBox="0 0 100 100"
+                    >
+                      <circle
+                        cx={50}
+                        cy={50}
+                        r={40}
+                        stroke="white"
+                        strokeLinecap="round"
+                        strokeDasharray="140 251"
+                        strokeWidth="1rem"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </li>
+
+              {/* show all groups */}
+              {groups.all.map((group) => (
+                <Group
+                  key={group.id}
+                  group={group}
+                  updateTask={updateTask}
+                  updateGroup={updateGroup}
+                  loading={loading}
+                  groupLoading={groupLoading}
+                  isGroupEdit={isGroupEdit}
+                  activeGroup={groups.active}
+                  refreshAll={refreshAll}
+                />
+              ))}
+            </>
           )}
-          {/* show all groups */}
-          {isAuth &&
-            groups.map((group) => (
-              <Group
-                key={group.id}
-                group={group}
-                updateTask={updateTask}
-                updateGroup={updateGroup}
-                loading={loading}
-                groupLoading={groupLoading}
-                isEdit={isEdit}
-                setIsEdit={setIsEdit}
-              />
-            ))}
         </ul>
+        
         {/* create new group */}
         {isAuth && (
           <form

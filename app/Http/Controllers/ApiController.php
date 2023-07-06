@@ -11,60 +11,40 @@ use Illuminate\Support\Facades\Hash;
 
 class ApiController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        //
-    }
 
     public function login(Request $request)
     {
-        try {
-            $credentials = $request->validate([
-                'email' => ['required', 'email'],
-                'password' => ['required'],
-            ]);
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-            if (Auth::attempt($credentials)) {
-                if (isset($request['device']) && strlen($request['device']) > 10) {
-                    $deviceName = $request['device'];
-                    $tokenDel = Auth::user()->tokens()
-                        ->where('name', $request['device'])
-                        ->first();
-                    if ($tokenDel) {
-                        $tokenDel->delete();
-                    }
-                    $token = Auth::user()->createToken($request['device'])->plainTextToken;
-                } else {
-                    $deviceName = 'Device' . random_int(00001, 99999) . (new DateTime())->format('dmyhms');
-                    $token = Auth::user()->createToken($deviceName)->plainTextToken;
+        if (Auth::attempt($credentials)) {
+            if (isset($request['device']) && strlen($request['device']) > 10) {
+                $deviceName = $request['device'];
+                $tokenDel = Auth::user()->tokens()
+                    ->where('name', $request['device'])
+                    ->first();
+                if ($tokenDel) {
+                    $tokenDel->delete();
                 }
-                return response()->json([
-                    'error' => false,
-                    'token' => $token,
-                    'deviceName' => $deviceName,
-                ]);
+                $token = Auth::user()->createToken($request['device'])->plainTextToken;
             } else {
-                return response()->json([
-                    'error' => true,
-                    'message' => 'your email or password are wrong',
-                    'type' => 'credentials',
-                ]);
+                $deviceName = 'Device' . random_int(00001, 99999) . (new DateTime())->format('dmyhms');
+                $token = Auth::user()->createToken($deviceName)->plainTextToken;
             }
-        } catch (\Throwable $th) {
             return response()->json([
-                'type' => 'field'
+                'error' => false,
+                'token' => $token,
+                'deviceName' => $deviceName,
+            ]);
+        } else {
+            return response()->json([
+                'error' => true,
+                'message' => 'your email or password are wrong',
+                'type' => 'credentials',
             ]);
         }
-    }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request)
-    {
-        //
     }
 
     /**
@@ -112,14 +92,6 @@ class ApiController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
     {
         //
     }
