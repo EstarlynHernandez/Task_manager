@@ -30,7 +30,7 @@ class ApiTgroupController extends Controller
     public function store(Request $request)
     {
         $item = $request->validate([
-            'name' => ['required', 'max:20', 'regex:/^[\pL\s\d]+$/u'],
+            'name' => ['required', 'max:20', 'min:3', 'regex:/^[\pL\s\d]+$/u'],
         ]);
 
         $tgroup = new Tgroup;
@@ -88,13 +88,14 @@ class ApiTgroupController extends Controller
     public function update(Request $request)
     {
         $item = $request->validate([
-            'id' => ['numeric', 'required']
+            'id' => ['numeric', 'required'],
+            'name' => ['required', 'max:20', 'min:3', 'regex:/^[\pL\s\d]+$/u'],
         ]);
 
         $tGroup = Tgroup::find($item['id']);
 
         if ($tGroup->exists() && $tGroup->user_id == Auth::user()->id) {
-            $tGroup->name = $request['name'];
+            $tGroup->name = $item['name'];
             $tGroup->save();
             return response()->json(['groups' => $this->getGroup()]);
         }

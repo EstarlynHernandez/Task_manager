@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { GlobalData } from "../IndexContex";
 
 export function Register() {
-  const { setPage, filterString, authErrors, setAuthErrors, Login } = useContext(GlobalData);
+  const { setPage, filterString, authErrors, setAuthErrors, Login, globalErrors, setGlobalErrors } = useContext(GlobalData);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -67,6 +67,16 @@ export function Register() {
       >
         <h1 className="tasks__title">Register</h1>
         {registerErrors.action && <h2 className="error">You need to fill all of the fields correctly</h2>}
+        {globalErrors?.length > 0 &&
+          globalErrors.map((e, key) => (
+            <h2
+              key={key}
+              className="error"
+              onClick={() => setGlobalErrors(false)}
+            >
+              {e.message}
+            </h2>
+          ))}
         <fieldset className="form__set">
           <label
             htmlFor="name"

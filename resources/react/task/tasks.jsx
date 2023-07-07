@@ -8,7 +8,7 @@ import { useGroup } from "../hooks/useGroups";
 
 export function Tasks() {
   const newDate = new Date();
-  const { isMenuOpen, currentGroup } = useContext(GlobalData);
+  const { isMenuOpen, currentGroup, globalErrors, setGlobalErrors } = useContext(GlobalData);
   const [tasks, updateTask] = useTasks([]);
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
@@ -57,7 +57,6 @@ export function Tasks() {
 
   function newTask(e) {
     e.preventDefault();
-    setTasksLoading(true);
     let task = {
       name: name,
       type: "normal",
@@ -65,6 +64,7 @@ export function Tasks() {
       run: setTasksLoading,
     };
     if (name.length >= 3) {
+      setTasksLoading(true);
       updateTask("create", task);
       setName("");
     } else {
@@ -91,6 +91,16 @@ export function Tasks() {
 
   return (
     <main className={"content"}>
+      {globalErrors?.length > 0 &&
+        globalErrors.map((e, key) => (
+          <h2
+            key={key}
+            className="error"
+            onClick={() => setGlobalErrors(false)}
+          >
+            {e.message}
+          </h2>
+        ))}
       {/* check create task is set open or close */}
       {isOpen && (
         <Create

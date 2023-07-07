@@ -1,4 +1,4 @@
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useEffect } from "react";
 import axios from "axios";
 
 export const GlobalData = createContext();
@@ -9,7 +9,16 @@ export function AppContex({ children }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [page, setPage] = useState("index");
   const [currentGroup, setCurrentGroup] = useState("task");
-  const [authErrors, setAuthErrors] = useState('');
+  const [authErrors, setAuthErrors] = useState("");
+  const [globalErrors, setGlobalErrors] = useState();
+
+  useEffect(() => {
+    if (globalErrors?.length > 0) {
+      setTimeout(() => {
+        setGlobalErrors(false);
+      }, 10000);
+    }
+  }, [globalErrors]);
 
   // return functions and variables
   return (
@@ -28,6 +37,8 @@ export function AppContex({ children }) {
         Login,
         authErrors,
         setAuthErrors,
+        globalErrors,
+        setGlobalErrors,
       }}
     >
       {children}
@@ -66,7 +77,7 @@ export function AppContex({ children }) {
           localStorage.setItem("token", r.data.token);
           localStorage.setItem("device", r.data.deviceName);
           setIsAuth(true);
-          setAuthErrors('');
+          setAuthErrors("");
           setPage("home");
         }
       })
