@@ -45,9 +45,11 @@ export function Group({ group, updateGroup, loading, groupLoading, isGroupEdit, 
 
   // update group
   function editGroup(e) {
-    e.preventDefault();
-    loading(group.id);
-    updateGroup("edit", { id: group.id, name: name, run: refreshAll });
+    if (name.length < 3) {
+      e.preventDefault();
+      loading(group.id);
+      updateGroup("edit", { id: group.id, name: name, run: refreshAll });
+    }
   }
 
   return (
@@ -68,7 +70,7 @@ export function Group({ group, updateGroup, loading, groupLoading, isGroupEdit, 
             <form onSubmit={(e) => editGroup(e)}>
               <input
                 type="text"
-                className="listM__link listM--textlimit form__input"
+                className={"listM__link listM--textlimit form__input " + (name.length < 3 && "error__text")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -84,7 +86,7 @@ export function Group({ group, updateGroup, loading, groupLoading, isGroupEdit, 
               {group.name.length > 15 && "..."}
             </p>
           )}
-          <div className={"d-group delete-desktop " + (isGroupEdit ? "edit__button" : "delete ")}>
+          <div className={"d-group delete-desktop " + (isGroupEdit && name?.length >= 3 ? "edit__button" : "delete ")}>
             {isGroupEdit ? <p onClick={editGroup}>Save</p> : <p onClick={deleteGroup}>Remove</p>}
           </div>
         </div>

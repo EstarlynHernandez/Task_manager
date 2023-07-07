@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { GlobalData } from "../IndexContex";
 
 export function Login() {
-  const { setPage, authErrors, filterString, Login, setAuthErrors } = useContext(GlobalData);
+  const { setPage, authErrors, filterString, Login, setAuthErrors, globalErrors, setGlobalErrors } = useContext(GlobalData);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
@@ -28,13 +28,23 @@ export function Login() {
           e.preventDefault();
           if (!filterString(email, "email|min:5") && !filterString(password, "min:3")) {
             Login({ password: password, email: email, action: "login" });
-          }else{
-            setAuthErrors({error: true, message: "you need to fill all of the field"});
+          } else {
+            setAuthErrors({ error: true, message: "you need to fill all of the field" });
           }
         }}
       >
         <h1 className="tasks__title">Login</h1>
         {loginErrors && <h2 className="error">{loginErrors.message}</h2>}
+        {globalErrors?.length > 0 &&
+          globalErrors.map((e, key) => (
+            <h2
+              key={key}
+              className="error"
+              onClick={() => setGlobalErrors(false)}
+            >
+              {e.message}
+            </h2>
+          ))}
         <fieldset className="form__set">
           <label
             htmlFor="email"

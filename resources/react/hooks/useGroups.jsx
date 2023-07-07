@@ -4,7 +4,7 @@ import { GlobalData } from "../IndexContex";
 
 export function useGroup(initialState) {
   const [groups, setGroups] = useState(initialState);
-  const { isAuth, setCurrentGroup } = useContext(GlobalData);
+  const { isAuth, setCurrentGroup, setGlobalErrors } = useContext(GlobalData);
 
   // get all group in the first loading page
   useEffect(() => {
@@ -21,7 +21,9 @@ export function useGroup(initialState) {
           setCurrentGroup(res.data.active);
         })
         .catch(() => {
-          console.log("error");
+          if (error.request.status == 422) {
+            setGlobalErrors([{ message: "Your request is invalid" }]);
+          }
         });
     }
   }, []);
@@ -38,12 +40,17 @@ export function useGroup(initialState) {
       },
     })
       .then((res) => {
-        item.run(false);
         setGroups({ all: res.data.groups, active: res.data.active });
         setCurrentGroup(res.data.active);
+        item.run && item.run(false);
       })
       .catch((error) => {
-        console.log(error);
+        if (error.request.status == 422) {
+          setGlobalErrors([{ message: "Your request is invalid" }]);
+        } else {
+          setGlobalErrors([{ message: "Generic Error" }]);
+        }
+        item.run && item.run(false);
       });
   }
 
@@ -68,10 +75,15 @@ export function useGroup(initialState) {
           setGroups({ all: groups.all, active: res.data.active });
         }
         setCurrentGroup(res.data.active);
-        item.run(false);
+        item.run && item.run(false);
       })
       .catch((error) => {
-        console.log(error);
+        if (error.request.status == 422) {
+          setGlobalErrors([{ message: "Your request is invalid" }]);
+        } else {
+          setGlobalErrors([{ message: "Generic Error" }]);
+        }
+        item.run && item.run(false);
       });
   }
 

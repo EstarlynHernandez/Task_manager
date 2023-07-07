@@ -4,7 +4,7 @@ import { GlobalData } from "../IndexContex";
 
 export function useTasks(initialState) {
   const [tasks, setTask] = useState(initialState);
-  const { isAuth } = useContext(GlobalData);
+  const { isAuth, setGlobalErrors, logout } = useContext(GlobalData);
 
   useEffect(getTask, []);
 
@@ -23,8 +23,12 @@ export function useTasks(initialState) {
           setTask(r.data.tasks);
           localStorage.setItem("token", r.data.token);
         })
-        .catch(() => {
-          console.log("error");
+        .catch((error) => {
+          if (error.request.status == 401) {
+            localStorage.removeItem("token");
+            logout();
+            setGlobalErrors([{ message: "Your session has expired please log in again" }]);
+          }
         });
     } else {
       // test user
@@ -69,10 +73,15 @@ export function useTasks(initialState) {
       })
         .then((res) => {
           setTask(res.data.tasks);
-          item.run(false);
+          item.run && item.run(false);
         })
         .catch((error) => {
-          console.log(error);
+          if (error.request.status == 422) {
+            setGlobalErrors([{ message: "Your request is invalid" }]);
+          } else {
+            setGlobalErrors([{ message: "Generic Error" }]);
+          }
+          item.run && item.run(false);
         });
     } else {
       // test user delete
@@ -111,7 +120,7 @@ export function useTasks(initialState) {
         localStorage.setItem("task", JSON.stringify([newItem]));
         setTask([newItem]);
       }
-      item.run(false);
+      item.run && item.run(false);
     }
   }
 
@@ -150,26 +159,14 @@ export function useTasks(initialState) {
       if (items) {
         let newItems = items.map((i) => {
           if (i.id == item.id) {
-            i.name = item.name;
-            i.details = item.details;
-            i.status = false;
-            i.id = item.id;
-            i.type = item.type;
-            i.date = item.date;
-            if (item.type == "repeat") {
-              i.count = item.count;
-              i.value = 0;
-            } else if (item.type == "time") {
-              i.count = item.value * 60;
-              i.value = item.value * 60;
-            }
+            i = getLocalTaskType(item);
           }
           return i;
         });
         localStorage.setItem("task", JSON.stringify(newItems));
         setTask(newItems);
       }
-      item.run(false);
+      item.run && item.run(false);
     }
   }
 
@@ -198,7 +195,12 @@ export function useTasks(initialState) {
         item.run && item.run(false);
       })
       .catch((error) => {
-        console.log(error);
+        if (error.request.status == 422) {
+          setGlobalErrors([{ message: "Your request is invalid" }]);
+        } else {
+          setGlobalErrors([{ message: "Generic Error" }]);
+        }
+        item.run && item.run(false);
       });
   }
 
